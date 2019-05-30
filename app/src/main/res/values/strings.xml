@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Safe</string>
+    <string name="api_key">AIzaSyB9qp-SgAh8SWFkNmraiY1kUCoVry9ND7w</string>
+    <string name="service_not_available">Geocoder service not available!</string>
+    <string name="accept_location">Choose location</string>
+    <string name="fail_location">Choose location first!</string>
+    <string name="invalid_lat_long_used">Invalid latitude or longtitude argument!</string>
+    <string name="no_address_found">No address was found!</string>
+    <string name="location_data">com.example.Safe.Location.LocationData</string>
+    <string name="result_data">com.example.Safe.Location.ResultData</string>
+    <string name="receiver_code">com.example.Safe.Activities.AddressReceiver</string>
+    <string name="address">com.example.Safe.Activities.Address</string>
+    <string name="location">com.example.Safe.Activities.Location</string>
+    <string name="location_available">com.example.Safe.Activities.LocationAvailable</string>
+    <string name="current_pos">Your position</string>
+    <string name="activity_info">com.example.safe.Activity.Info</string>
+    <string name="time_text">Estimated time of journey: </string>
+    <string name="add_contact">Add contact</string>
+    <string name="added_contacts">Added contacts:</string>
+    <string name="start_activity">Start new activity</string>
+    <string name="manage_contacts_button">Manage contacts</string>
+    <string name="new_activity_main">Start new activity</string>
+    <string name="edit_contact">Edit</string>
+    <string name="delete_contact">Delete</string>
+    <string name="duration">intent.duation</string>
+    <string name="messages">intent_send_messages</string>
+</resources>

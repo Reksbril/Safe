@@ -1,0 +1,4 @@
+<resources>
+    <integer name="REQUEST_ACCESS_FINE_LOCATION">123</integer>
+    <integer name="REQUEST_ACCESS_COARSE_LOCATION">412</integer>
+</resources>
