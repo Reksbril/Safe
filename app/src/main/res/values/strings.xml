@@ -25,4 +25,6 @@
     <string name="duration">intent.duation</string>
     <string name="messages">intent_send_messages</string>
     <string name="back">Back</string>
+    <string name="accept_message">Accept</string>
+    <string name="add_message_hint">Type message to send.</string>
 </resources>

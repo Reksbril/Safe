@@ -28,7 +28,8 @@
         <activity android:name=".View.Activities.SelectDestinationActivity"></activity>
         <service android:name=".View.Background.CurrentActivity"></service>
         <activity android:name=".View.Activities.OngoingActivity"></activity>
-        <activity android:name=".View.Activities.ManageContactsActivity"></activity>
+        <activity android:name=".View.Activities.ManageContactsActivity"
+                    android:windowSoftInputMode="adjustPan"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

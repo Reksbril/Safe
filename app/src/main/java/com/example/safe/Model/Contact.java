@@ -6,9 +6,12 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
+import com.example.safe.R;
+
 @Entity
 public class Contact {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    private Integer id;
     @NonNull
     private String number;
     @ColumnInfo
@@ -18,9 +21,18 @@ public class Contact {
     @ColumnInfo
     private Integer imageId;
 
-    public Contact(@NonNull String number, String name) {
+    public Contact(@NonNull String number, @NonNull String name, @NonNull String message) {
+        this(number, name, message, R.drawable.ic_launcher_foreground);
+    }
+
+    private Contact(@NonNull String number,
+                    @NonNull String name,
+                    @NonNull String message,
+                    @NonNull Integer imageId) {
         this.number = number;
         this.name = name;
+        this.message = message;
+        this.imageId = imageId;
     }
 
     public void setMessage(String message) {
@@ -63,5 +75,13 @@ public class Contact {
         Contact c = (Contact)o;
 
         return c.number.equals(number);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

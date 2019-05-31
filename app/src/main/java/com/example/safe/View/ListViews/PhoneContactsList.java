@@ -52,10 +52,10 @@ public class PhoneContactsList extends CursorAdapter {
             View rowView=inflater.inflate(R.layout.list_phone_contact, null,true);
             ((TextView)rowView.findViewById(R.id.name)).setText(name);
             ((TextView)rowView.findViewById(R.id.phoneNumber)).setText(phoneNo);
-            ((Button)rowView.findViewById(R.id.buttonAdd)).setOnClickListener(new View.OnClickListener() {
+            (rowView.findViewById(R.id.buttonAdd)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((ManageContactsActivity)v.getContext()).addToList(name, phoneNo, "asd");
+                    ((ManageContactsActivity)v.getContext()).addToList(name, phoneNo);
                 }
             });
             return rowView;

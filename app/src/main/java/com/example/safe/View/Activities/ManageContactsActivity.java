@@ -14,9 +14,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.safe.Database.Database;
@@ -27,12 +29,16 @@ import com.example.safe.Database.DbSingleton;
 import com.example.safe.R;
 import com.example.safe.View.ListViews.PhoneContactsList;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ManageContactsActivity extends Activity {
     private ArrayAdapter<Contact> adapter;
     private CursorAdapter cursorAdapter;
+    private EditText messageText;
+    private List<Contact> toCommit;
 
 
     class LoadDBTask extends AsyncTask<Void, Void, Void> {
@@ -76,6 +82,9 @@ public class ManageContactsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_contacts);
 
+
+        messageText = findViewById(R.id.messageText);
+
         new LoadDBTask().execute();
 
         Button addButton = new Button(this);
@@ -98,11 +107,18 @@ public class ManageContactsActivity extends Activity {
             @Override
             public void onClick(View v) {
                 hidePhoneContacts();
+                hideAddMessage();
             }
         });
 
         ListView phoneList = findViewById(R.id.phoneContacts);
         phoneList.addHeaderView(backButton);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //commit data to database
     }
 
     private void stopLoadingScreen() {
@@ -125,6 +141,14 @@ public class ManageContactsActivity extends Activity {
         layout.setVisibility(View.INVISIBLE);
     }
 
+    private void showAddMessage() {
+        findViewById(R.id.addMessageView).setVisibility(View.VISIBLE);
+    }
+
+    private void hideAddMessage() {
+        findViewById(R.id.addMessageView).setVisibility(View.INVISIBLE);
+    }
+
     private void getContactList() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED)
@@ -139,8 +163,29 @@ public class ManageContactsActivity extends Activity {
         cursorAdapter = new PhoneContactsList(this, cursor);
     }
 
-    public void addToList(String name, String number, String message) {
-        adapter.add(new Contact(number, name));
-        adapter.notifyDataSetChanged();
+    public void addToList(final String name, final String number) {
+        showAddMessage();
+
+        findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.add(new Contact(number, name, messageText.getText().toString()));
+                adapter.notifyDataSetChanged();
+                hideKeyboard();
+                messageText.setText("");
+                hideAddMessage();
+            }
+        });
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(this);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

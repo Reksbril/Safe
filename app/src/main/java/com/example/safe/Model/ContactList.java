@@ -8,15 +8,29 @@ import com.example.safe.Database.DbSingleton;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ContactList extends AbstractList<Contact> {
-    private ContactDao dao;
-    private ArrayList<Contact> list;
+    private List<Contact> list;
+    private List<Observer> observers;
+
+    public interface Observer {
+        void notifyAdd(Contact contact);
+        void notifyDelete(Contact contact);
+    }
 
     public ContactList(ContactDao dao) {
-        this.dao = dao;
-        list = new ArrayList<>(dao.getAll());
+        list = Collections.synchronizedList(new ArrayList<>(dao.getAll()));
+        observers = Collections.synchronizedList(new LinkedList<Observer>());
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
     }
 
     @Override
@@ -26,15 +40,9 @@ public class ContactList extends AbstractList<Contact> {
 
     @Override
     public boolean add(final Contact newContact) {
-        if(contains(newContact))
-            return false;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dao.insert(newContact);
-                list.add(newContact);
-            }
-        }).start();
+        for(Observer o : observers)
+            o.notifyAdd(newContact);
+        list.add(newContact);
         return true;
     }
 
@@ -49,31 +57,22 @@ public class ContactList extends AbstractList<Contact> {
             return false;
         final Contact toRemove = (Contact) obj;
         if(list.contains(toRemove)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    dao.delete(toRemove);
-                    list.remove(toRemove);
-                }
-            }).start();
+            for(Observer o : observers)
+                o.notifyDelete(toRemove);
+            list.remove(toRemove);
             return true;
         }
-
         return false;
     }
 
     @Override
     public Contact remove(final int position) {
-        if(position < 0 || position >= list.size())
+        if (position < 0 || position >= list.size())
             return null;
         final Contact toRemove = get(position);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dao.delete(toRemove);
-                list.remove(position);
-            }
-        }).start();
+        for(Observer o : observers)
+            o.notifyDelete(toRemove);
+        list.remove(position);
         return toRemove;
     }
 }
