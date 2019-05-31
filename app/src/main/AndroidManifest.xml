@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
 
 
 
@@ -25,7 +26,6 @@
 
         <activity android:name=".View.Activities.StartActivity"></activity>
         <activity android:name=".View.Activities.SelectDestinationActivity"></activity>
-        <service android:name=".Services.Location.AddressDecoder"></service>
         <service android:name=".View.Background.CurrentActivity"></service>
         <activity android:name=".View.Activities.OngoingActivity"></activity>
         <activity android:name=".View.Activities.ManageContactsActivity"></activity>

@@ -24,4 +24,5 @@
     <string name="delete_contact">Delete</string>
     <string name="duration">intent.duation</string>
     <string name="messages">intent_send_messages</string>
+    <string name="back">Back</string>
 </resources>

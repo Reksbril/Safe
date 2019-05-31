@@ -22,7 +22,6 @@ public class ContactsList extends ArrayAdapter<String>{
         this.context = context;
         this.info = info;
         this.imageId = imageId;
-
     }
 
     @Override

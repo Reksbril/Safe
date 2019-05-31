@@ -48,4 +48,20 @@ public class Contact {
     public void setImageId(Integer imageId) {
         this.imageId = imageId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == this)
+            return true;
+
+        if(o == null)
+            return false;
+
+        if(getClass() != o.getClass())
+            return false;
+
+        Contact c = (Contact)o;
+
+        return c.number.equals(number);
+    }
 }

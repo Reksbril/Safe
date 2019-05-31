@@ -1,6 +1,10 @@
 package com.example.safe.View.ListViews;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +19,9 @@ import com.example.safe.R;
 
 import java.util.ArrayList;
 
-public class ManageContactsList extends ArrayAdapter<String> {
+import static android.content.ContentValues.TAG;
+
+public class ManageContactsList extends ArrayAdapter<Contact> {
     private final Activity context;
     private ContactList contacts;
 
@@ -23,7 +29,7 @@ public class ManageContactsList extends ArrayAdapter<String> {
     public ManageContactsList(Activity context,
                               int resource,
                               ContactList contacts) {
-        super(context, resource, contacts.getNumbers());
+        super(context, resource, contacts);
         this.contacts = contacts;
         this.context = context;
     }
@@ -33,19 +39,24 @@ public class ManageContactsList extends ArrayAdapter<String> {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.list_item_edit, null,true);
 
-        String shortMessage = contacts.get(position).substring(0, 50);
+//        String shortMessage = contacts.get(position).getMessage().substring(0, 50);
+        String shortMessage = "shortmessage";
 
-        ((TextView)rowView.findViewById(R.id.name)).setText(name.get(position));
+        ((TextView)rowView.findViewById(R.id.name)).setText(contacts.get(position).getName());
         ((TextView)rowView.findViewById(R.id.message)).setText(shortMessage);
         ((ImageView)rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
 
         rowView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                remove(name.get(position));
+                Contact toRemove = contacts.get(position);
+                remove(toRemove);
             }
         });
 
+        System.out.println("xD");
         return rowView;
     }
+
+
 }

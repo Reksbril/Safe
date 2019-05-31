@@ -2,26 +2,15 @@ package com.example.safe.Database;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.ContextWrapper;
+
+//todo zrobić singleton
+
 
 public class DbSingleton {
-    public static volatile Context appContext;
-    public final Database db;
+    public final Database database;
 
-    private DbSingleton() {
-        db = Room.databaseBuilder(appContext, Database.class, "name").build();
-    }
-
-    private static class SingletonHolder {
-        public static final DbSingleton instance = new DbSingleton();
-    }
-
-    public static DbSingleton getInstance() {
-        if(appContext == null)
-            throw new RuntimeException("Application context must be set first!");
-        return SingletonHolder.instance;
-    }
-
-    public static void setAppContext(Context context) {
-        appContext = context;
+    public DbSingleton(Context context) {
+        database = Room.databaseBuilder(context, Database.class, "name").build();
     }
 }
