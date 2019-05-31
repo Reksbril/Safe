@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -13,12 +14,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class LocationTrackerImpl implements LocationTracker {
+public class LocationSupplier {
     private FusedLocationProviderClient locationClient;
     private Activity activity;
-    private boolean started = false;
 
-    public LocationTrackerImpl(Activity activity) {
+    public LocationSupplier(@NonNull Activity activity) {
         locationClient = LocationServices.getFusedLocationProviderClient(activity);
         this.activity = activity;
 
@@ -43,31 +43,13 @@ public class LocationTrackerImpl implements LocationTracker {
         return true;
     }
 
-    private void requestLocation(OnSuccessListener<Location> listener) throws SecurityException {
-        locationClient.getLastLocation().addOnSuccessListener(activity, listener);
-    }
-
-    public boolean start(final int delay, final OnSuccessListener<Location> listener) {
-        if(!checkPermissions())
-            return false;
-
-        if(!started) {
-            started = true;
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(checkPermissions())
-                        requestLocation(listener);
-                    if(started)
-                        handler.postDelayed(this, delay);
-                }
-            }, delay);
+    public void requestLocation(OnSuccessListener<Location> listener) {
+        try {
+            if(checkPermissions())
+                locationClient.getLastLocation().addOnSuccessListener(activity, listener);
+        } catch(SecurityException e) {
+            //although program will never throw this exception, try{}catch block is needed
+            e.printStackTrace();
         }
-        return false;
-    }
-
-    public void stop() {
-        started = false;
     }
 }

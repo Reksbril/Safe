@@ -1,19 +1,52 @@
 package com.example.safe.View.Background;
 
+import android.app.Activity;
 import android.location.Location;
 
+import com.example.safe.Location.LocationSupplier;
 import com.example.safe.Model.LocationGuard;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.Calendar;
+import java.util.Timer;
 
 class LocationGuardImpl implements LocationGuard {
     private final Location destination;
     private Location currentLocation;
+    private final LocationSupplier locationSupplier;
+    private final long interval; //zmienna oznacza minimalny odstęp czasu (w milisekundach)
+                                //pomiędzy dwoma próbami pobrania lokalizacji
+    private long lastRequestMillis;
+    private float eps = 1.f; //odległość od celu (w metrach), która jest uznawana za wystarczającą
+                            //do zakończenia podróży
 
-    LocationGuardImpl(Location destination) {
+
+    LocationGuardImpl(Activity activity, Location destination, long interval) {
         this.destination = destination;
+        locationSupplier = new LocationSupplier(activity);
+        locationSupplier.requestLocation(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                currentLocation = location;
+            }
+        });
+        this.interval = interval;
+        this.lastRequestMillis = Calendar.getInstance().getTimeInMillis();
     }
 
     @Override
     public boolean destinationReached() {
+        if(currentLocation.distanceTo(destination) < eps)
+            return true;
+
+        if(Calendar.getInstance().getTimeInMillis() - lastRequestMillis > interval)
+            locationSupplier.requestLocation(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    currentLocation = location;
+                }
+            });
+
         return false;
     }
 

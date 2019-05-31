@@ -8,12 +8,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.example.safe.Model.ContactList;
 import com.example.safe.View.ListViews.ManageContactsList;
-import com.example.safe.Database.Contact;
+import com.example.safe.Model.Contact;
 import com.example.safe.Database.DbSingleton;
 import com.example.safe.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ManageContactsActivity extends Activity {
 
@@ -22,24 +24,9 @@ public class ManageContactsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_contacts);
 
-        DbSingleton.setAppContext(this);
-        final DbSingleton db = DbSingleton.getInstance();
-        new AsyncTask<String, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(String... strings) {
-                db.db.contactDao().insert(new Contact("asd", "asd"));
-                return null;
-            }
-
-        }.execute("xD");
-
-        ArrayList<String> asd = new ArrayList<>();
-        asd.add("Asdasdasd");
-
 
         final ArrayAdapter<String> adapter =
-                new ManageContactsList(this, R.layout.list_item_edit, asd);
+                new ManageContactsList(this, R.layout.list_item_edit, new ContactList());
         ListView list = (ListView)findViewById(R.id.contactsList);
         list.setAdapter(adapter);
 
@@ -54,7 +41,7 @@ public class ManageContactsActivity extends Activity {
         });
 
 
-        list.addFooterView(addButton);
+        list.addHeaderView(addButton);
     }
 
 }

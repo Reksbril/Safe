@@ -156,7 +156,8 @@ public class SelectDestinationActivity extends FragmentActivity implements OnMap
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        if (requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_FINE_LOCATION)) {
+        if (requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_FINE_LOCATION) ||
+            requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_COARSE_LOCATION)) {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

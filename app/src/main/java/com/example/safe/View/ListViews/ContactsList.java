@@ -33,7 +33,7 @@ public class ContactsList extends ArrayAdapter<String>{
         ImageView img = rowView.findViewById(R.id.imageView);
         img.setImageResource(R.drawable.common_google_signin_btn_icon_dark_normal_background);
 
-        TextView textView = rowView.findViewById(R.id.tekst);
+        TextView textView = rowView.findViewById(R.id.name);
         textView.setText("xDD");
 
         System.out.println(position);

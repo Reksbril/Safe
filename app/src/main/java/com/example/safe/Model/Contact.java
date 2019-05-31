@@ -1,4 +1,4 @@
-package com.example.safe.Database;
+package com.example.safe.Model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

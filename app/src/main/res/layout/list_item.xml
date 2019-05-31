@@ -14,7 +14,7 @@
         android:foreground="@drawable/ic_launcher_background" />
 
     <TextView
-        android:id="@+id/tekst"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"

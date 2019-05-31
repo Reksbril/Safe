@@ -1,10 +1,8 @@
 package com.example.safe.Database;
 
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
-import android.arch.persistence.room.DatabaseConfiguration;
-import android.arch.persistence.room.InvalidationTracker;
 import android.arch.persistence.room.RoomDatabase;
-import android.support.annotation.NonNull;
+
+import com.example.safe.Model.Contact;
 
 
 @android.arch.persistence.room.Database(entities = {Contact.class}, version = 1)

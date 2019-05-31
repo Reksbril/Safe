@@ -1,5 +1,6 @@
 package com.example.safe.View.Background;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,9 +14,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.IntRange;
 
 import com.example.safe.Model.ActivityInfo;
+import com.example.safe.Model.LocationGuard;
 import com.example.safe.Model.Message;
+import com.example.safe.Model.Timer;
 import com.example.safe.View.Activities.OngoingActivity;
 import com.example.safe.R;
 
@@ -24,6 +28,29 @@ import java.util.ArrayList;
 public class CurrentActivity extends Service {
     private ActivityInfo activity;
 
+    private class TimerImpl implements Timer {
+        private int delay;
+        private int numberOfTicksLeft;
+
+        TimerImpl(@IntRange(from = 1) int delay, @IntRange(from = 0) int numberOfTicks) {
+            this.delay = delay;
+            this.numberOfTicksLeft = numberOfTicks;
+        }
+
+        @Override
+        public int getDelay() {
+            return delay;
+        }
+
+        @Override
+        public boolean tick() {
+            //todo aktualizwoanie notifikacji itd
+            if(numberOfTicksLeft == 0)
+                return true;
+            numberOfTicksLeft--;
+            return false;
+        }
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startid) {
@@ -60,33 +87,6 @@ public class CurrentActivity extends Service {
             startForeground(1337, notification);
         }
 
-
-        new CountDownTimer(30000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                if(stopped)
-                    this.cancel();
-                System.out.println("working...");
-            }
-
-            public void onFinish() {
-                System.out.println("finish");
-            }
-        }.start();
-/*
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(!stopped) {
-                    System.out.println("Working...");
-                    if (!checkConditions()) {
-                        notifyUser();
-                    }
-                    handler.postDelayed(this, 2000);
-                }
-            }
-        }, 2000);*/
-
         return START_STICKY;
     }
 
@@ -97,9 +97,10 @@ public class CurrentActivity extends Service {
         int duration = bundle.getInt(context.getString(R.string.duration));
         ArrayList<Message> messages = (ArrayList<Message>)bundle.get(context.getString(R.string.messages));
 
+      //  LocationGuard guard = new LocationGuardImpl(new Activity(), destination, 1000);
 
 
-        activity = new ActivityInfo()
+        //activity = new ActivityInfo(guard, new TimerImpl(1, duration),);
     }
 
     private boolean checkConditions() {
@@ -114,7 +115,6 @@ public class CurrentActivity extends Service {
 
     @Override
     public void onDestroy() {
-        stopped = true;
         super.onDestroy();
     }
 
