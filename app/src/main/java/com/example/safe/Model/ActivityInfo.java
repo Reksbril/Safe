@@ -18,7 +18,7 @@ public class ActivityInfo {
     private HandlerThread thread;
 
 
-    ActivityInfo(LocationGuard locationGuard, Timer timer, Runnable onFail, Runnable onSuccess) {
+    public ActivityInfo(LocationGuard locationGuard, Timer timer, Runnable onFail, Runnable onSuccess) {
         this.locationGuard = locationGuard;
         this.onActivityFail = onFail;
         this.onActivitySuccess = onSuccess;

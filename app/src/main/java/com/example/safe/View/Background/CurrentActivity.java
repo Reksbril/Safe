@@ -58,6 +58,7 @@ public class CurrentActivity extends Service {
 
         NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
+        //todo ogarnąć dobrze to powiadomienie (napisy itd)
 
         if (android.os.Build.VERSION.SDK_INT >= 26) { //TODO niższe wersje (bez notification channel)
             String CHANNEL_ID = "my_channel_01";
@@ -87,6 +88,8 @@ public class CurrentActivity extends Service {
             startForeground(1337, notification);
         }
 
+        init(intent);
+
         return START_STICKY;
     }
 
@@ -97,10 +100,29 @@ public class CurrentActivity extends Service {
         int duration = bundle.getInt(context.getString(R.string.duration));
         ArrayList<Message> messages = (ArrayList<Message>)bundle.get(context.getString(R.string.messages));
 
-      //  LocationGuard guard = new LocationGuardImpl(new Activity(), destination, 1000);
+        LocationGuard guard = new LocationGuardImpl(context, destination, 1000);
 
+        Runnable onSuccess = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("SUCESS");
+            }
+        };
 
-        //activity = new ActivityInfo(guard, new TimerImpl(1, duration),);
+        Runnable onFail = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("FAIL");
+            }
+        };
+
+        activity = new ActivityInfo(
+                guard,
+                new TimerImpl(1, duration),
+                onFail,
+                onSuccess);
+
+        activity.startActivity();
     }
 
     private boolean checkConditions() {

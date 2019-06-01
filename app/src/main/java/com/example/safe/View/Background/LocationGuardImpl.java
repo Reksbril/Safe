@@ -1,6 +1,7 @@
 package com.example.safe.View.Background;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 
 import com.example.safe.Location.LocationSupplier;
@@ -21,9 +22,9 @@ class LocationGuardImpl implements LocationGuard {
                             //do zakończenia podróży
 
 
-    LocationGuardImpl(Activity activity, Location destination, long interval) {
+    LocationGuardImpl(Context context, Location destination, long interval) {
         this.destination = destination;
-        locationSupplier = new LocationSupplier(activity);
+        locationSupplier = new LocationSupplier(context);
         locationSupplier.requestLocation(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
