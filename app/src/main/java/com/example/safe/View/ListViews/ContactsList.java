@@ -8,20 +8,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.safe.Model.Contact;
 import com.example.safe.R;
 
 import java.util.ArrayList;
 
-public class ContactsList extends ArrayAdapter<String>{
+public class ContactsList extends ArrayAdapter<Contact>{
     //todo dodać więcej pól
     private final Activity context;
-    private ArrayList<Integer> imageId;
-    private ArrayList<String> info;
-    public ContactsList(Activity context, ArrayList<String> info, ArrayList<Integer> imageId) {
-        super(context, R.layout.list_item, info);
+    public ContactsList(Activity context, ArrayList<Contact> contacts) {
+        super(context, R.layout.list_item, contacts);
         this.context = context;
-        this.info = info;
-        this.imageId = imageId;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class ContactsList extends ArrayAdapter<String>{
         img.setImageResource(R.drawable.common_google_signin_btn_icon_dark_normal_background);
 
         TextView textView = rowView.findViewById(R.id.name);
-        textView.setText("xDD");
+        textView.setText(getItem(position).getName());
 
         System.out.println(position);
         return rowView;

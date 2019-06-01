@@ -74,7 +74,7 @@ public class Contact {
 
         Contact c = (Contact)o;
 
-        return c.number.equals(number);
+        return c.number.equals(number) && c.message.equals(message);
     }
 
     public Integer getId() {

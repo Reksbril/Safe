@@ -13,24 +13,9 @@ import java.util.List;
 
 public class ContactList extends AbstractList<Contact> {
     private List<Contact> list;
-    private List<Observer> observers;
 
-    public interface Observer {
-        void notifyAdd(Contact contact);
-        void notifyDelete(Contact contact);
-    }
-
-    public ContactList(ContactDao dao) {
-        list = Collections.synchronizedList(new ArrayList<>(dao.getAll()));
-        observers = Collections.synchronizedList(new LinkedList<Observer>());
-    }
-
-    public void addObserver(Observer observer) {
-        observers.add(observer);
-    }
-
-    public void removeObserver(Observer observer) {
-        observers.remove(observer);
+    public ContactList(List<Contact> initList) {
+        list = Collections.synchronizedList(initList);
     }
 
     @Override
@@ -40,8 +25,6 @@ public class ContactList extends AbstractList<Contact> {
 
     @Override
     public boolean add(final Contact newContact) {
-        for(Observer o : observers)
-            o.notifyAdd(newContact);
         list.add(newContact);
         return true;
     }
@@ -57,8 +40,6 @@ public class ContactList extends AbstractList<Contact> {
             return false;
         final Contact toRemove = (Contact) obj;
         if(list.contains(toRemove)) {
-            for(Observer o : observers)
-                o.notifyDelete(toRemove);
             list.remove(toRemove);
             return true;
         }
@@ -70,8 +51,6 @@ public class ContactList extends AbstractList<Contact> {
         if (position < 0 || position >= list.size())
             return null;
         final Contact toRemove = get(position);
-        for(Observer o : observers)
-            o.notifyDelete(toRemove);
         list.remove(position);
         return toRemove;
     }

@@ -27,4 +27,5 @@
     <string name="back">Back</string>
     <string name="accept_message">Accept</string>
     <string name="add_message_hint">Type message to send.</string>
+    <string name="cancel_button">Cancel</string>
 </resources>

@@ -19,10 +19,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.example.safe.Database.ContactDao;
 import com.example.safe.Database.Database;
 import com.example.safe.Model.ContactList;
+import com.example.safe.View.Activities.AsyncTasks.LoadDb;
 import com.example.safe.View.ListViews.ManageContactsList;
 import com.example.safe.Model.Contact;
 import com.example.safe.Database.DbSingleton;
@@ -32,33 +35,15 @@ import com.example.safe.View.ListViews.PhoneContactsList;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+//TODO zrobić commit po pewnym czasie (np dodać przycisk "save") albo jakoś ogarnąć dodawanie do bazy po każdym dodaniu do listy (np. odpalać loading screen)
 public class ManageContactsActivity extends Activity {
     private ArrayAdapter<Contact> adapter;
     private CursorAdapter cursorAdapter;
     private EditText messageText;
-    private List<Contact> toCommit;
-
-
-    class LoadDBTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... args) {
-            adapter = new ManageContactsList(
-                    ManageContactsActivity.this,
-                    R.layout.list_item_edit,
-                    new ContactList(new DbSingleton(ManageContactsActivity.this).database.contactDao()));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            ListView list = findViewById(R.id.contactsList);
-            list.setAdapter(adapter);
-            stopLoadingScreen();
-        }
-    }
+    private ContactDao dao;
 
     class LoadContactsTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -76,16 +61,61 @@ public class ManageContactsActivity extends Activity {
         }
     }
 
+    enum DbOperationType {ADD, DELETE, EDIT}
+
+    private class DbOperation {
+        Contact contact;
+        DbOperationType type;
+
+        DbOperation(Contact contact, DbOperationType type) {
+            this.contact = contact;
+            this.type = type;
+        }
+    }
+
+    class CommitDbTask extends AsyncTask<DbOperation, Void, Void> {
+        @Override
+        protected Void doInBackground(DbOperation... args) {
+            for(DbOperation arg : args) {
+                switch(arg.type) {
+                    case ADD:
+                        dao.insert(arg.contact);
+                        break;
+                    case DELETE:
+                        dao.delete(arg.contact);
+                        break;
+                    case EDIT:
+                        dao.update(arg.contact);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            stopLoadingScreen();
+        }
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_contacts);
 
+        dao = new DbSingleton(this).database.contactDao();
 
         messageText = findViewById(R.id.messageText);
 
-        new LoadDBTask().execute();
+        new LoadDb(dao, false) {
+            @Override
+            protected void onPostExecute(ArrayAdapter<Contact> result) {
+                adapter = result;
+                ListView list = findViewById(R.id.contactsList);
+                list.setAdapter(adapter);
+                stopLoadingScreen();
+            }
+        }.execute(this);
 
         Button addButton = new Button(this);
         addButton.setText(R.string.add_contact);
@@ -108,6 +138,7 @@ public class ManageContactsActivity extends Activity {
             public void onClick(View v) {
                 hidePhoneContacts();
                 hideAddMessage();
+                hideKeyboard();
             }
         });
 
@@ -115,11 +146,6 @@ public class ManageContactsActivity extends Activity {
         phoneList.addHeaderView(backButton);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        //commit data to database
-    }
 
     private void stopLoadingScreen() {
         ConstraintLayout layout = findViewById(R.id.loadingLayout);
@@ -163,19 +189,48 @@ public class ManageContactsActivity extends Activity {
         cursorAdapter = new PhoneContactsList(this, cursor);
     }
 
+
     public void addToList(final String name, final String number) {
         showAddMessage();
 
         findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.add(new Contact(number, name, messageText.getText().toString()));
+                startLoadingScreen();
+                Contact toAdd = new Contact(number, name, messageText.getText().toString());
+                new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
+                adapter.add(toAdd);
                 adapter.notifyDataSetChanged();
                 hideKeyboard();
                 messageText.setText("");
                 hideAddMessage();
             }
         });
+    }
+
+    public void editListElement(final int position) {
+        showAddMessage();
+
+        findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startLoadingScreen();
+                Contact toEdit = adapter.getItem(position);
+                toEdit.setMessage(messageText.getText().toString());
+                new CommitDbTask().execute(new DbOperation(toEdit, DbOperationType.EDIT));
+                adapter.notifyDataSetChanged();
+                hideKeyboard();
+                messageText.setText("");
+                hideAddMessage();
+            }
+        });
+    }
+
+    public void remove(Contact contact) {
+        startLoadingScreen();
+        new CommitDbTask().execute(new DbOperation(contact, DbOperationType.DELETE));
+        adapter.remove(contact);
+        adapter.notifyDataSetChanged();
     }
 
     private void hideKeyboard() {
