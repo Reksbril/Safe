@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//PRZYCISK DELETE W EKRANIE USTAWIANIA ACTIVITY W LIŚCIE MA DZIAŁAĆ XD
 //wpisywanie wiadomości, która ma zostać wysłana powinna być w większym oknie i ogólnie to jakoś bardziej ogarnięte
 //lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
 //lista kontaktów w dodawaniu do nowego activity powinna być na całą szerokość
+//wyświetlanie na liście kontaktów, poza imieniem, też jakąś część wiadomości
 //jak mamy jakiś widok na przodzie (np widok kontaków z telefonu) to kliknięcie na tło mogłoby jednocześnie go zamykać
 //uniemożliwić dodawanie kilka razy tego samego kontaktu - najlepiej checkboxy żeby były zaznaczone w tych kontaktach które są już dodane, albo jakoś na szaro je zrobić
 //czasami nie dziaała obracanie ekranu - to też ogarnąć

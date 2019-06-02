@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.safe.Model.Contact;
 import com.example.safe.R;
+import com.example.safe.View.Activities.StartActivity;
 
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ public class ContactsList extends ArrayAdapter<Contact>{
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.list_item, null,true);
 
@@ -31,6 +32,13 @@ public class ContactsList extends ArrayAdapter<Contact>{
 
         TextView textView = rowView.findViewById(R.id.name);
         textView.setText(getItem(position).getName());
+
+        rowView.findViewById(R.id.buttonDelete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((StartActivity)v.getContext()).deleteContact(getItem(position));
+            }
+        });
 
         return rowView;
     }

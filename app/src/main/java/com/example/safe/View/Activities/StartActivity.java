@@ -48,6 +48,7 @@ public class StartActivity extends Activity {
     private EditText time;
     private ArrayAdapter<Contact> adapter;
     private ArrayList<Contact> contacts;
+    private ContactsList contactsAdapter;
 
     //to load state
     private boolean addViewOpened = false;
@@ -165,7 +166,7 @@ public class StartActivity extends Activity {
 
         contacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
-        final ContactsList contactsAdapter = new
+        contactsAdapter = new
                 ContactsList(this, contacts);
         ListView list = findViewById(R.id.contactList);
         list.setAdapter(contactsAdapter);
@@ -269,5 +270,11 @@ public class StartActivity extends Activity {
         Pattern p = Pattern.compile("[0-9]|[0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9][0-9][0-9]");
         Matcher m = p.matcher(time);
         return m.matches();
+    }
+
+    public void deleteContact(Contact contact) {
+        Integer pos = adapter.getPosition(contact);
+        contactsAdapter.remove(contact);
+        addedContacts.remove(pos);
     }
 }
