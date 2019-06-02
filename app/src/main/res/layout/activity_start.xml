@@ -8,7 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,7 +34,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -88,15 +90,13 @@
         android:layout_height="match_parent"
         android:background="#9E8A8A8A"
         android:clickable="true"
+        android:focusable="auto"
         android:visibility="invisible">
 
         <ListView
             android:id="@+id/chooseContacts"
-            android:layout_width="333dp"
-            android:layout_height="514dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:background="#FFFFFF"
             android:paddingLeft="4dp"
