@@ -34,17 +34,27 @@ import java.util.regex.Pattern;
 
 
 public class StartActivity extends Activity {
+    private final String locationCode = "DEST_LOCATION";
+    private final String addressCode = "DEST_ADDRESS";
+    private final String timeCode = "TIME";
+    private final String toAddCode = "TO_ADD_ARRAY";
+    private final String addViewOpenedCode = "ADD_VIEW_OPENED";
+
     private final static int DEST_SELECT_CODE = 15523;
     private Button accept;
     private Location destination;
     private TextView addressView;
     private EditText time;
     private List<Contact> toAdd;
+    private ArrayList<Integer> toAddIndices;
     private ArrayAdapter<Contact> adapter;
     private ArrayList<Contact> contacts;
 
+    //to load state
+    private boolean addViewOpened = false;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
@@ -139,10 +149,12 @@ public class StartActivity extends Activity {
             public void onClick(View v) {
                 closeChoosingContacts();
                 toAdd.clear();
+                toAddIndices.clear();
             }
         });
 
         toAdd = new ArrayList<>();
+        toAddIndices = new ArrayList<>();
 
         footer.addView(cancel);
         footer.addView(accept);
@@ -160,20 +172,37 @@ public class StartActivity extends Activity {
             public void onClick(View v) {
                 contactsAdapter.addAll(toAdd);
                 toAdd.clear();
+                toAddIndices.clear();
                 closeChoosingContacts();
             }
         });
 
 
         new LoadDb(new DbSingleton(this).database.contactDao(), true) {
-
             @Override
             protected void onPostExecute(ArrayAdapter<Contact> result) {
                 ListView list = findViewById(R.id.chooseContacts);
                 list.setAdapter(result);
                 adapter = result;
+
+                if(savedInstanceState != null) {
+                    toAddIndices = savedInstanceState.getIntegerArrayList(toAddCode);
+                    toAdd = ((ManageContactsList)adapter).checkBoxes(toAddIndices);
+                }
             }
         }.execute(this);
+
+
+        //load instance state
+        if(savedInstanceState != null) {
+            String address = savedInstanceState.getString(addressCode);
+            if (address != null && !address.equals("")) {
+                ((TextView) findViewById(R.id.displayLocation)).setText(address);
+                destination = savedInstanceState.getParcelable(locationCode);
+            }
+            time.setText(savedInstanceState.getString(timeCode));
+        }
+
 
     }
 
@@ -188,25 +217,38 @@ public class StartActivity extends Activity {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        bundle.putParcelable(locationCode, destination);
+        bundle.putString(addressCode, addressView.getText().toString());
+        bundle.putString(timeCode, time.getText().toString());
+        bundle.putIntegerArrayList(toAddCode, toAddIndices);
+        bundle.putBoolean(addViewOpenedCode, addViewOpened);
+    }
+
     private void openChoosingContacts() {
         findViewById(R.id.chooseContactsView).setVisibility(View.VISIBLE);
+        addViewOpened = true;
     }
 
     private void closeChoosingContacts() {
         findViewById(R.id.chooseContactsView).setVisibility(View.INVISIBLE);
         ((ManageContactsList)adapter).uncheckBoxes();
         accept.setVisibility(View.INVISIBLE);
+        addViewOpened = false;
     }
 
     public void checkBox(int position) {
         if(toAdd.size() == 0)
             accept.setVisibility(View.VISIBLE);
         toAdd.add(adapter.getItem(position));
+        toAddIndices.add(position);
         accept.setText("Confirm (" + toAdd.size() + ")");
     }
 
     public void uncheckBox(int position) {
         toAdd.remove(adapter.getItem(position));
+        toAddIndices.remove(position);
         if(toAdd.size() == 0)
             accept.setVisibility(View.INVISIBLE);
         accept.setText("Confirm (" + toAdd.size() + ")");

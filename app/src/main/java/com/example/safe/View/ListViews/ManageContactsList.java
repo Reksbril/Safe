@@ -23,7 +23,10 @@ import com.example.safe.View.Activities.ManageContactsActivity;
 import com.example.safe.View.Activities.StartActivity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static android.content.ContentValues.TAG;
@@ -31,7 +34,7 @@ import static android.content.ContentValues.TAG;
 public class ManageContactsList extends ArrayAdapter<Contact> {
     private final Activity context;
     private final boolean choose;
-    private Set<CheckBox> checkBoxes;
+    private Map<Integer, CheckBox> checkBoxes;
 
 
     public ManageContactsList(Activity context,
@@ -41,7 +44,7 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
         super(context, resource, contacts);
         this.context = context;
         this.choose = choose;
-        checkBoxes = new HashSet<>();
+        checkBoxes = new HashMap<>();
     }
 
     @Override
@@ -70,7 +73,7 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
                         ((StartActivity)context).uncheckBox(position);
                 }
             });
-            checkBoxes.add(box);
+            checkBoxes.put(position, box);
         }
         else {
             rowView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
@@ -92,8 +95,20 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
     }
 
     public void uncheckBoxes() {
-        for(CheckBox box : checkBoxes)
-            box.setChecked(false);
+        for(Map.Entry<Integer, CheckBox> box : checkBoxes.entrySet())
+            box.getValue().setChecked(false);
+    }
+
+    public ArrayList<Contact> checkBoxes(List<Integer> indices) {
+        ArrayList<Contact> result = new ArrayList<>();
+        for(int ind : indices) {
+            CheckBox box = checkBoxes.get(ind);
+            if(box != null) {
+                box.setChecked(true);
+                result.add(getItem(ind));
+            }
+        }
+        return result;
     }
 
 
