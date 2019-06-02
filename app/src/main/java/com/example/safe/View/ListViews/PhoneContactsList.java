@@ -55,7 +55,7 @@ public class PhoneContactsList extends CursorAdapter {
             (rowView.findViewById(R.id.buttonAdd)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((ManageContactsActivity)v.getContext()).addToList(name, phoneNo);
+                    ((ManageContactsActivity)v.getContext()).addToList(name, phoneNo, "");
                 }
             });
             return rowView;

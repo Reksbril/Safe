@@ -76,34 +76,19 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
             rowView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showDeleteDialog(position);
+                    ((ManageContactsActivity) v.getContext()).showDeleteDialog(position);
                 }
             });
             rowView.findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((ManageContactsActivity) v.getContext()).editListElement(position);
+                    ((ManageContactsActivity) v.getContext()).editListElement(position, "");
                 }
             });
             rowView.findViewById(R.id.checkBox).setVisibility(View.INVISIBLE);
         }
 
         return rowView;
-    }
-
-    private void showDeleteDialog(final int position) {
-        new AlertDialog.Builder(context)
-                .setTitle("Delete entry")
-                .setMessage("Are you sure you want to delete this entry?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Contact toRemove = getItem(position);
-                        ((ManageContactsActivity)context).remove(toRemove);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 
     public void uncheckBoxes() {

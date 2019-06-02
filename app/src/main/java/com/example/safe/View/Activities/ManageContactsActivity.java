@@ -2,8 +2,10 @@ package com.example.safe.View.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -40,10 +42,28 @@ import java.util.List;
 
 //TODO zrobić commit po pewnym czasie (np dodać przycisk "save") albo jakoś ogarnąć dodawanie do bazy po każdym dodaniu do listy (np. odpalać loading screen)
 public class ManageContactsActivity extends Activity {
+    private final String phoneVisibility = "PHONE_VISIBILITY";
+    private final String addVisibility = "ADD_VISIBLE";
+    private final String toAddNameCode = "TO_ADD_NAME";
+    private final String toAddNumberCode = "TO_ADD_NUMBER";
+    private final String toAddMessage = "TO_ADD_MESSAGE";
+    private final String addOrEdit = "ADD_EDIT";
+    private final String editIndex = "EDIT_INDEX";
+    private final String deleteIndex = "DELETE_INDEX";
+
+
     private ArrayAdapter<Contact> adapter;
     private CursorAdapter cursorAdapter;
     private EditText messageText;
     private ContactDao dao;
+    private AlertDialog deleteDialog;
+
+    //to save instance state
+    private String toAddName = "";
+    private String toAddNumber = "";
+    private boolean add_edit = false; //true jeżeli add, false jeżeli edit
+    private int toRemoveInDialog;
+    private int editing;
 
     class LoadContactsTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -99,7 +119,7 @@ public class ManageContactsActivity extends Activity {
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.manage_contacts);
 
@@ -114,6 +134,13 @@ public class ManageContactsActivity extends Activity {
                 ListView list = findViewById(R.id.contactsList);
                 list.setAdapter(adapter);
                 stopLoadingScreen();
+
+                //load instance state
+                if(savedInstanceState != null) {
+                    int deleteInd = savedInstanceState.getInt(deleteIndex);
+                    if (deleteInd >= 0)
+                        showDeleteDialog(deleteInd);
+                }
             }
         }.execute(this);
 
@@ -122,8 +149,7 @@ public class ManageContactsActivity extends Activity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLoadingScreen();
-                new LoadContactsTask().execute();
+                openPhoneContacts();
             }
         });
 
@@ -144,6 +170,54 @@ public class ManageContactsActivity extends Activity {
 
         ListView phoneList = findViewById(R.id.phoneContacts);
         phoneList.addHeaderView(backButton);
+
+        if(savedInstanceState != null) {
+            //load instance state
+            int addPhoneVisibility = savedInstanceState.getInt(phoneVisibility);
+
+            if (addPhoneVisibility == View.VISIBLE)
+                openPhoneContacts();
+
+            if (savedInstanceState.getInt(addVisibility) == View.VISIBLE) {
+                String message = savedInstanceState.getString(toAddMessage);
+                if (savedInstanceState.getBoolean(addOrEdit)) {
+                    String name = savedInstanceState.getString(toAddNameCode);
+                    String number = savedInstanceState.getString(toAddNumberCode);
+                    addToList(name, number, message);
+                } else {
+                    int position = savedInstanceState.getInt(editIndex);
+                    editListElement(position, message);
+                }
+            }
+        }
+
+    }
+
+    private void openPhoneContacts() {
+        startLoadingScreen();
+        new LoadContactsTask().execute();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        //phone list
+        outState.putInt(phoneVisibility, findViewById(R.id.phoneContactsView).getVisibility());
+
+        //add new/ edit
+        outState.putInt(addVisibility, findViewById(R.id.addMessageView).getVisibility());
+        outState.putString(toAddNameCode, toAddName);
+        outState.putString(toAddNumberCode, toAddNumber);
+        outState.putBoolean(addOrEdit, add_edit);
+        outState.putString(toAddMessage, messageText.getText().toString());
+        outState.putInt(editIndex, editing);
+
+        //delete
+        if(deleteDialog != null && deleteDialog.isShowing()) {
+            outState.putInt(deleteIndex, toRemoveInDialog);
+            deleteDialog.dismiss();
+        }
+        else
+            outState.putInt(deleteIndex, -1);
     }
 
 
@@ -167,7 +241,9 @@ public class ManageContactsActivity extends Activity {
         layout.setVisibility(View.INVISIBLE);
     }
 
-    private void showAddMessage() {
+    private void showAddMessage(String initMessage) {
+        EditText view = findViewById(R.id.messageText);
+        view.setText(initMessage);
         findViewById(R.id.addMessageView).setVisibility(View.VISIBLE);
     }
 
@@ -190,8 +266,12 @@ public class ManageContactsActivity extends Activity {
     }
 
 
-    public void addToList(final String name, final String number) {
-        showAddMessage();
+    public void addToList(final String name, final String number, final String initMessage) {
+        add_edit = true;
+        toAddNumber = number;
+        toAddName = name;
+
+        showAddMessage(initMessage);
 
         findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,8 +288,10 @@ public class ManageContactsActivity extends Activity {
         });
     }
 
-    public void editListElement(final int position) {
-        showAddMessage();
+    public void editListElement(final int position, String initMessage) {
+        add_edit = false;
+        editing = position;
+        showAddMessage(initMessage);
 
         findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -242,5 +324,20 @@ public class ManageContactsActivity extends Activity {
             view = new View(this);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void showDeleteDialog(int position) {
+        toRemoveInDialog = position;
+        final Contact toRemove = adapter.getItem(position);
+        deleteDialog = new AlertDialog.Builder(this)
+                .setTitle("Delete entry")
+                .setMessage("Are you sure you want to delete this entry?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        remove(toRemove);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert).show();
     }
 }
