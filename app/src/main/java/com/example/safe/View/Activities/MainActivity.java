@@ -60,6 +60,6 @@ public class MainActivity extends AppCompatActivity {
 //poprawić design okna wybru kontaktu
 //stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś
 //ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans
-
+//wydajnośc listview
 
 //ogólny design aplikacji

@@ -39,19 +39,21 @@ public class StartActivity extends Activity {
     private final String timeCode = "TIME";
     private final String toAddCode = "TO_ADD_ARRAY";
     private final String addViewOpenedCode = "ADD_VIEW_OPENED";
+    private final String contactsToAdd = "CONTACTS_TO_ADD";
 
     private final static int DEST_SELECT_CODE = 15523;
     private Button accept;
     private Location destination;
     private TextView addressView;
     private EditText time;
-    private List<Contact> toAdd;
-    private ArrayList<Integer> toAddIndices;
     private ArrayAdapter<Contact> adapter;
     private ArrayList<Contact> contacts;
 
     //to load state
     private boolean addViewOpened = false;
+    private List<Contact> toAdd;
+    private ArrayList<Integer> toAddIndices;
+    private ArrayList<Integer> addedContacts;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -162,6 +164,7 @@ public class StartActivity extends Activity {
         ((ListView)findViewById(R.id.chooseContacts)).addFooterView(footer);
 
         contacts = new ArrayList<>();
+        addedContacts = new ArrayList<>();
         final ContactsList contactsAdapter = new
                 ContactsList(this, contacts);
         ListView list = findViewById(R.id.contactList);
@@ -171,6 +174,7 @@ public class StartActivity extends Activity {
             @Override
             public void onClick(View v) {
                 contactsAdapter.addAll(toAdd);
+                addedContacts.addAll(toAddIndices);
                 toAdd.clear();
                 toAddIndices.clear();
                 closeChoosingContacts();
@@ -186,12 +190,20 @@ public class StartActivity extends Activity {
                 adapter = result;
 
                 if(savedInstanceState != null) {
-                    toAddIndices = savedInstanceState.getIntegerArrayList(toAddCode);
-                    toAdd = ((ManageContactsList)adapter).checkBoxes(toAddIndices);
+                    if(savedInstanceState.getBoolean(addViewOpenedCode)) {
+                        openChoosingContacts();
+                        ArrayList<Integer> tmp = savedInstanceState.getIntegerArrayList(toAddCode);
+                        ((ManageContactsList) adapter).checkBoxes(tmp);
+                    }
+
+                    //list of added contacts
+                    addedContacts = savedInstanceState.getIntegerArrayList(contactsToAdd);
+                    for(Integer pos : addedContacts) {
+                        contactsAdapter.add(adapter.getItem(pos));
+                    }
                 }
             }
         }.execute(this);
-
 
         //load instance state
         if(savedInstanceState != null) {
@@ -202,8 +214,6 @@ public class StartActivity extends Activity {
             }
             time.setText(savedInstanceState.getString(timeCode));
         }
-
-
     }
 
     @Override
@@ -224,6 +234,7 @@ public class StartActivity extends Activity {
         bundle.putString(timeCode, time.getText().toString());
         bundle.putIntegerArrayList(toAddCode, toAddIndices);
         bundle.putBoolean(addViewOpenedCode, addViewOpened);
+        bundle.putIntegerArrayList(contactsToAdd, addedContacts);
     }
 
     private void openChoosingContacts() {
@@ -248,7 +259,7 @@ public class StartActivity extends Activity {
 
     public void uncheckBox(int position) {
         toAdd.remove(adapter.getItem(position));
-        toAddIndices.remove(position);
+        toAddIndices.remove((Integer)position);
         if(toAdd.size() == 0)
             accept.setVisibility(View.INVISIBLE);
         accept.setText("Confirm (" + toAdd.size() + ")");

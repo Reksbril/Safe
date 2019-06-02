@@ -32,7 +32,6 @@ public class ContactsList extends ArrayAdapter<Contact>{
         TextView textView = rowView.findViewById(R.id.name);
         textView.setText(getItem(position).getName());
 
-        System.out.println(position);
         return rowView;
     }
 }

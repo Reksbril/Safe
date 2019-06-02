@@ -34,7 +34,7 @@ import static android.content.ContentValues.TAG;
 public class ManageContactsList extends ArrayAdapter<Contact> {
     private final Activity context;
     private final boolean choose;
-    private Map<Integer, CheckBox> checkBoxes;
+    private Map<Integer, Boolean> checkBoxes;
 
 
     public ManageContactsList(Activity context,
@@ -68,12 +68,18 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
                 @Override
                 public void onClick(View v) {
                     if(((CheckBox)v).isChecked())
-                        ((StartActivity)context).checkBox(position);
+                        ((StartActivity) context).checkBox(position);
                     else
-                        ((StartActivity)context).uncheckBox(position);
+                        ((StartActivity) context).uncheckBox(position);
+                    checkBoxes.put(position, ((CheckBox)v).isChecked());
                 }
             });
-            checkBoxes.put(position, box);
+            Boolean oldBox = checkBoxes.get(position);
+            if(oldBox != null) {
+                if(oldBox)
+                    box.setChecked(true);
+            } else
+                checkBoxes.put(position, false);
         }
         else {
             rowView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
@@ -95,22 +101,13 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
     }
 
     public void uncheckBoxes() {
-        for(Map.Entry<Integer, CheckBox> box : checkBoxes.entrySet())
-            box.getValue().setChecked(false);
+        checkBoxes.clear();
     }
 
-    public ArrayList<Contact> checkBoxes(List<Integer> indices) {
-        ArrayList<Contact> result = new ArrayList<>();
+    public void checkBoxes(List<Integer> indices) {
         for(int ind : indices) {
-            CheckBox box = checkBoxes.get(ind);
-            if(box != null) {
-                box.setChecked(true);
-                result.add(getItem(ind));
-            }
+            checkBoxes.put(ind, true);
+            ((StartActivity) context).checkBox(ind);
         }
-        return result;
     }
-
-
-
 }
