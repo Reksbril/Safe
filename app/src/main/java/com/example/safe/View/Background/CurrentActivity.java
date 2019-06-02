@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 public class CurrentActivity extends Service {
     private ActivityInfo activity;
+    private NotificationManager manager;
 
     private class TimerImpl implements Timer {
         private int delay;
@@ -44,11 +45,10 @@ public class CurrentActivity extends Service {
 
         @Override
         public boolean tick() {
-            //todo aktualizwoanie notifikacji itd
             if(numberOfTicksLeft == 0)
-                return true;
+                return false;
             numberOfTicksLeft--;
-            return false;
+            return true;
         }
     }
 
@@ -56,7 +56,7 @@ public class CurrentActivity extends Service {
     public int onStartCommand(Intent intent, int flags, int startid) {
        // unpackActivityInfo(intent);
 
-        NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         //todo ogarnąć dobrze to powiadomienie (napisy itd)
 
@@ -79,11 +79,14 @@ public class CurrentActivity extends Service {
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(this, 0, showActivity, 0);
 
+            int iconId = R.mipmap.ic_launcher;
+            String title = "My awesome app";
+
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle("My Awesome App")
+                    .setSmallIcon(iconId)
+                    .setContentTitle(title)
                     .setContentIntent(pendingIntent)
-                    .setContentText("Doing some work...").build();
+                    .setContentText("").build();
 
             startForeground(1337, notification);
         }
@@ -98,27 +101,28 @@ public class CurrentActivity extends Service {
         Bundle bundle = intent.getExtras();
         Location destination = (Location)bundle.get(context.getString(R.string.location_data));
         int duration = bundle.getInt(context.getString(R.string.duration));
-        ArrayList<Message> messages = (ArrayList<Message>)bundle.get(context.getString(R.string.messages));
+        final ArrayList<Message> messages = (ArrayList<Message>)bundle.get(context.getString(R.string.messages));
 
         LocationGuard guard = new LocationGuardImpl(context, destination, 1000);
 
         Runnable onSuccess = new Runnable() {
             @Override
             public void run() {
-                System.out.println("SUCESS");
+                //todo
             }
         };
 
         Runnable onFail = new Runnable() {
             @Override
             public void run() {
-                System.out.println("FAIL");
+                for(Message message : messages)
+                    message.send();
             }
         };
 
         activity = new ActivityInfo(
                 guard,
-                new TimerImpl(1, duration),
+                new TimerImpl(1000, duration / 1000),
                 onFail,
                 onSuccess);
 

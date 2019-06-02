@@ -7,12 +7,13 @@
     android:orientation="vertical"
     tools:context=".View.Activities.MainActivity">
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/manageContacts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="@string/manage_contacts_button" />
+        android:text="@string/manage_contacts_button"
+        android:backgroundTint="@color/colorAccent"/>
 
     <Button
         android:id="@+id/startNew"

@@ -37,6 +37,9 @@ class LocationGuardImpl implements LocationGuard {
 
     @Override
     public boolean destinationReached() {
+        if(currentLocation == null)
+            return false;
+        System.out.println(currentLocation.distanceTo(destination));
         if(currentLocation.distanceTo(destination) < eps)
             return true;
 
