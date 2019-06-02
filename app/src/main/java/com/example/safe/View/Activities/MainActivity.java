@@ -45,7 +45,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//loading na mapie w trakcie czekania na geocodera
-//countdown w notification i w OngoingActivity
-//implementacje timer, message, LocationTracker
-//ogarnięcie jakiegoś dodawania nowych kontaktów
+//obracanie ekranu w każdym activity - design
+//obracanie ekranu w każdym activity - odpowiednie zachowanie
+//poprawić/dodać sprawdzanie dostępów (lokalizacja, wiadomości, kotakty...)
+//dodać komunikaty o błędach w momencie rozpoczynania activity (czas/lokalicacja/kontakty)
+//usuwanie klawiatury w odpowiednich momentach, w oknie rozpoczynania activity
+//możliwośc anulowania edycji kontaktu w oknie "managecontactsactivity"
+//poprawić design okna wybru kontaktu
+//stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś
+//ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans
+
+//ogólny design aplikacji
