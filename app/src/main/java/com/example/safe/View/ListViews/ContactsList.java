@@ -12,11 +12,15 @@ import com.example.safe.Model.Contact;
 import com.example.safe.R;
 import com.example.safe.View.Activities.StartActivity;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class ContactsList extends ArrayAdapter<Contact>{
     //todo dodać więcej pól
     private final Activity context;
+    private final int MAX_MESSAGE_LEN = 30;
+
     public ContactsList(Activity context, ArrayList<Contact> contacts) {
         super(context, R.layout.list_item, contacts);
         this.context = context;
@@ -32,6 +36,12 @@ public class ContactsList extends ArrayAdapter<Contact>{
 
         TextView textView = rowView.findViewById(R.id.name);
         textView.setText(getItem(position).getName());
+
+        String message = getItem(position).getMessage();
+        if(message.length() > MAX_MESSAGE_LEN)
+            message = message.substring(0, MAX_MESSAGE_LEN - 3) + "...";
+        ((TextView)rowView.findViewById(R.id.shortMessage)).setText(message);
+
 
         rowView.findViewById(R.id.buttonDelete).setOnClickListener(new View.OnClickListener() {
             @Override

@@ -45,9 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
-//lista kontaktów w dodawaniu do nowego activity powinna być na całą szerokość
-//wyświetlanie na liście kontaktów, poza imieniem, też jakąś część wiadomości
 //jak mamy jakiś widok na przodzie (np widok kontaków z telefonu) to kliknięcie na tło mogłoby jednocześnie go zamykać
 //uniemożliwić dodawanie kilka razy tego samego kontaktu - najlepiej checkboxy żeby były zaznaczone w tych kontaktach które są już dodane, albo jakoś na szaro je zrobić
 //czasami nie dziaała obracanie ekranu - to też ogarnąć
@@ -58,7 +55,15 @@ public class MainActivity extends AppCompatActivity {
 //poprawić design okna wybru kontaktu
 //stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś
 //ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans
+//kliknięcie na kontakt powinno pokazywać całą wiadomość do wysłania
 //wydajnośc listview
+//coś zbugowane z tą listą gdzie są checkboxy (jak się zamknie z zaznaczonymi, to po otwarciu dalej są jakieś zaznaczone)
+//przycisk startactivity powinien być jakiś inny. Na przykład podobnie jak z tym plusem w dodawaniu kontaktów
+//tak samo przycisk add new - może być w sumie jako header zamiast footer, ale coś trzeba zmienić
 //dodać taki mały "+" w prawym dolnym rogu do dodawania kontaktów
+//lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
+//lista kontaktów w dodawaniu do nowego activity powinna być na całą szerokość
+//ogarnąć wszystkie listy jeżeli chodzi o szerokość tych wszystkich widoków
+//najlepiej ustawić MAX_MESSAGE_LEN różne w zależności od szerokości ekranu itd
 
 //ogólny design aplikacji
