@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//czasami nie dziaała obracanie ekranu - to też ogarnąć
-//poprawić/dodać sprawdzanie dostępów (lokalizacja, wiadomości, kotakty...)
+//sprawdzić czy smsy działają
 //dodać komunikaty o błędach w momencie rozpoczynania activity (czas/lokalicacja/kontakty)
 //usuwanie klawiatury w odpowiednich momentach, w oknie rozpoczynania activity
 //możliwośc anulowania edycji kontaktu w oknie "managecontactsactivity"

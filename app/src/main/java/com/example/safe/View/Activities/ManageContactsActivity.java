@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -279,12 +280,13 @@ public class ManageContactsActivity extends Activity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_CONTACTS},
                     getResources().getInteger(R.integer.REQUEST_ACCESS_CONTACTS));
+        else {
+            ContentResolver cr = getContentResolver();
+            Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                    null, null, null, null);
 
-        ContentResolver cr = getContentResolver();
-        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
-
-        cursorAdapter = new PhoneContactsList(this, cursor);
+            cursorAdapter = new PhoneContactsList(this, cursor);
+        }
     }
 
 
@@ -357,5 +359,22 @@ public class ManageContactsActivity extends Activity {
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .setIcon(android.R.drawable.ic_dialog_alert).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResult) {
+        if(requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_CONTACTS)) {
+            for(int i = 0; i < permissions.length; i++) {
+                if(permissions[i].equals(Manifest.permission.READ_CONTACTS)) {
+                    if(grantResult[i] == PackageManager.PERMISSION_GRANTED)
+                        openPhoneContacts();
+                    else
+                        hidePhoneContacts();
+                }
+            }
+        }
+
     }
 }

@@ -1,10 +1,15 @@
 package com.example.safe.View.Activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -116,22 +121,15 @@ public class StartActivity extends Activity {
                     //TODO za mało kontaktów
                     return;
                 }
-                Intent intent = new Intent(getApplicationContext(), CurrentActivity.class);
-                intent.putExtra(getString(R.string.location_data), destination);
-                //duration in milliseconds
-                int duration = Integer.parseInt(time.getText().toString()) * 60 * 1000;
-                intent.putExtra(getString(R.string.duration), duration);
+                //permission do wysyłania sms
+                if(ContextCompat.checkSelfPermission(StartActivity.this,
+                        Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                    ActivityCompat.requestPermissions(StartActivity.this,
+                            new String[]{Manifest.permission.SEND_SMS},
+                            getResources().getInteger(R.integer.REQUEST_SEND_SMS));
 
-                ArrayList<Message> messages = new ArrayList<>();
-                for(Contact contact : contacts)
-                    messages.add(new Sms(contact.getMessage(), contact.getNumber()));
-                intent.putExtra(getString(R.string.messages), messages);
 
-                startService(intent);
-                finish();
-
-                Intent newActivity = new Intent(getApplicationContext(), OngoingActivity.class);
-                startActivity(newActivity);
+                startNewActivity();
             }
         });
 
@@ -228,6 +226,25 @@ public class StartActivity extends Activity {
 
     }
 
+    private void startNewActivity() {
+        Intent intent = new Intent(getApplicationContext(), CurrentActivity.class);
+        intent.putExtra(getString(R.string.location_data), destination);
+        //duration in milliseconds
+        int duration = Integer.parseInt(time.getText().toString()) * 60 * 1000;
+        intent.putExtra(getString(R.string.duration), duration);
+
+        ArrayList<Message> messages = new ArrayList<>();
+        for(Contact contact : contacts)
+            messages.add(new Sms(contact.getMessage(), contact.getNumber()));
+        intent.putExtra(getString(R.string.messages), messages);
+
+        startService(intent);
+        finish();
+
+        Intent newActivity = new Intent(getApplicationContext(), OngoingActivity.class);
+        startActivity(newActivity);
+    }
+
     private void closePhoneContacts() {
         phoneContactsOpened = false;
         closeChoosingContacts();
@@ -319,5 +336,18 @@ public class StartActivity extends Activity {
 
     public boolean isAdded(int position) {
         return addedContacts.contains(position);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == getResources().getInteger(R.integer.REQUEST_SEND_SMS)) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startNewActivity();
+            }
+        }
     }
 }

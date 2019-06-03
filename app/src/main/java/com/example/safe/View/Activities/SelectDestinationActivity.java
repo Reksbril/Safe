@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -155,7 +156,8 @@ public class SelectDestinationActivity extends FragmentActivity implements OnMap
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_FINE_LOCATION) ||
             requestCode == getResources().getInteger(R.integer.REQUEST_ACCESS_COARSE_LOCATION)) {
             // If request is cancelled, the result arrays are empty.

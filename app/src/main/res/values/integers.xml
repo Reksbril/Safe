@@ -2,4 +2,5 @@
     <integer name="REQUEST_ACCESS_FINE_LOCATION">123</integer>
     <integer name="REQUEST_ACCESS_COARSE_LOCATION">412</integer>
     <integer name="REQUEST_ACCESS_CONTACTS">512</integer>
+    <integer name="REQUEST_SEND_SMS">132</integer>
 </resources>
