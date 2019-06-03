@@ -19,6 +19,7 @@ public class OngoingActivity extends Activity {
             @Override
             public void onClick(View v) {
                 stopService(new Intent(getApplicationContext(), CurrentActivity.class));
+                finish();
             }
         });
     }

@@ -127,9 +127,8 @@ public class StartActivity extends Activity {
                     ActivityCompat.requestPermissions(StartActivity.this,
                             new String[]{Manifest.permission.SEND_SMS},
                             getResources().getInteger(R.integer.REQUEST_SEND_SMS));
-
-
-                startNewActivity();
+                else
+                    startNewActivity();
             }
         });
 

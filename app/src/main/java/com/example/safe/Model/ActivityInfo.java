@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Observer;
 
 public class ActivityInfo {
     private final LocationGuard locationGuard;
@@ -17,12 +18,18 @@ public class ActivityInfo {
 
     private HandlerThread thread;
 
+    public interface Observer {
+        void notifyFinish();
+    }
+
+    private ArrayList<Observer> observers;
 
     public ActivityInfo(LocationGuard locationGuard, Timer timer, Runnable onFail, Runnable onSuccess) {
         this.locationGuard = locationGuard;
         this.onActivityFail = onFail;
         this.onActivitySuccess = onSuccess;
         this.timer = timer;
+        this.observers = new ArrayList<>();
 
         final String threadName = "ActivityInfo.ThreadName";
         thread = new HandlerThread(threadName);
@@ -42,18 +49,21 @@ public class ActivityInfo {
                     if (timer.tick()) {
                         if (locationGuard.destinationReached()) {
                             onActivitySuccess.run();
-                            stopped = true;
+                            stopActivity();
+                            notifyObservers();
                         } else {
                             if(locationGuard.outOfSafeLocation()) {
                                 onActivityFail.run();
-                                stopped = true;
+                                stopActivity();
+                                notifyObservers();
                             } else
                                 handler.postDelayed(this, timer.getDelay());
                         }
 
                     } else {
                         onActivityFail.run();
-                        stopped = true;
+                        stopActivity();
+                        notifyObservers();
                     }
                 }
             }
@@ -64,5 +74,14 @@ public class ActivityInfo {
 
     public void stopActivity() {
         stopped = true;
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers() {
+        for(Observer o : observers)
+            o.notifyFinish();
     }
 }

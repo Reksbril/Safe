@@ -126,6 +126,13 @@ public class CurrentActivity extends Service {
                 onFail,
                 onSuccess);
 
+        activity.addObserver(new ActivityInfo.Observer() {
+            @Override
+            public void notifyFinish() {
+                stopService(new Intent(getApplicationContext(), CurrentActivity.class));
+            }
+        });
+
         activity.startActivity();
     }
 
@@ -141,6 +148,7 @@ public class CurrentActivity extends Service {
 
     @Override
     public void onDestroy() {
+        activity.stopActivity();
         super.onDestroy();
     }
 
