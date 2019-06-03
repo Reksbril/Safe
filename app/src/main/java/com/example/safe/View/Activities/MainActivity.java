@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//jak mamy jakiś widok na przodzie (np widok kontaków z telefonu) to kliknięcie na tło mogłoby jednocześnie go zamykać
 //uniemożliwić dodawanie kilka razy tego samego kontaktu - najlepiej checkboxy żeby były zaznaczone w tych kontaktach które są już dodane, albo jakoś na szaro je zrobić
 //czasami nie dziaała obracanie ekranu - to też ogarnąć
 //poprawić/dodać sprawdzanie dostępów (lokalizacja, wiadomości, kotakty...)
@@ -67,3 +66,4 @@ public class MainActivity extends AppCompatActivity {
 //najlepiej ustawić MAX_MESSAGE_LEN różne w zależności od szerokości ekranu itd
 
 //ogólny design aplikacji
+//jak pojawiąją się jakieś okienka czy coś to zrobic żeby to wyglądało ładnie

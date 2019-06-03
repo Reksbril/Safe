@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +41,8 @@ public class StartActivity extends Activity {
     private final String toAddCode = "TO_ADD_ARRAY";
     private final String addViewOpenedCode = "ADD_VIEW_OPENED";
     private final String contactsToAdd = "CONTACTS_TO_ADD";
+
+    private volatile boolean phoneContactsOpened = false;
 
     private final static int DEST_SELECT_CODE = 15523;
     private Button accept;
@@ -135,7 +138,9 @@ public class StartActivity extends Activity {
         findViewById(R.id.addContact).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                phoneContactsOpened = true;
                 openChoosingContacts();
+                hideKeyboard();
             }
         });
 
@@ -150,9 +155,7 @@ public class StartActivity extends Activity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeChoosingContacts();
-                toAdd.clear();
-                toAddIndices.clear();
+                closePhoneContacts();
             }
         });
 
@@ -215,6 +218,21 @@ public class StartActivity extends Activity {
             }
             time.setText(savedInstanceState.getString(timeCode));
         }
+
+        findViewById(R.id.backLayout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard();
+            }
+        });
+
+    }
+
+    private void closePhoneContacts() {
+        phoneContactsOpened = false;
+        closeChoosingContacts();
+        toAdd.clear();
+        toAddIndices.clear();
     }
 
     @Override
@@ -276,5 +294,24 @@ public class StartActivity extends Activity {
         Integer pos = adapter.getPosition(contact);
         contactsAdapter.remove(contact);
         addedContacts.remove(pos);
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(this);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(phoneContactsOpened)
+            closePhoneContacts();
+        else
+            super.onBackPressed();
     }
 }

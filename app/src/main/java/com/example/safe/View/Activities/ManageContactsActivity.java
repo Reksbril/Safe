@@ -204,6 +204,13 @@ public class ManageContactsActivity extends Activity {
             }
         });
 
+        findViewById(R.id.phoneContactsView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hidePhoneContacts();
+            }
+        });
+
     }
 
     private void openPhoneContacts() {
