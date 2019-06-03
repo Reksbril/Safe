@@ -59,6 +59,7 @@
         android:id="@+id/addMessageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#17181818"
         android:clickable="true"
         android:visibility="invisible">
 
@@ -69,6 +70,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:background="#FFFFFF"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -77,17 +79,38 @@
 
             <EditText
                 android:id="@+id/messageText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="299dp"
+                android:layout_height="163dp"
+                android:layout_margin="3dp"
+                android:background="#FFFFFF"
                 android:ems="10"
                 android:hint="@string/add_message_hint"
-                android:inputType="textPersonName" />
+                android:inputType="textMultiLine"
+                android:gravity="start" />
 
-            <Button
-                android:id="@+id/acceptMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/accept_message" />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <Button
+                    android:id="@+id/acceptMessage"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/accept_message" />
+
+                <Button
+                    android:id="@+id/decline"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/decline_new_contact" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>

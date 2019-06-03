@@ -91,7 +91,9 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
             rowView.findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((ManageContactsActivity) v.getContext()).editListElement(position, "");
+                    ((ManageContactsActivity) v.getContext()).editListElement(
+                            position,
+                            getItem(position).getMessage());
                 }
             });
             rowView.findViewById(R.id.checkBox).setVisibility(View.INVISIBLE);

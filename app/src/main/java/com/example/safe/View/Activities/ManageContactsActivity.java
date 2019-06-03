@@ -164,7 +164,6 @@ public class ManageContactsActivity extends Activity {
             public void onClick(View v) {
                 hidePhoneContacts();
                 hideAddMessage();
-                hideKeyboard();
             }
         });
 
@@ -190,6 +189,20 @@ public class ManageContactsActivity extends Activity {
                 }
             }
         }
+
+        findViewById(R.id.decline).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideAddMessage();
+            }
+        });
+
+        findViewById(R.id.addMessageView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard();
+            }
+        });
 
     }
 
@@ -249,6 +262,8 @@ public class ManageContactsActivity extends Activity {
 
     private void hideAddMessage() {
         findViewById(R.id.addMessageView).setVisibility(View.INVISIBLE);
+        messageText.setText("");
+        hideKeyboard();
     }
 
     private void getContactList() {
@@ -281,8 +296,6 @@ public class ManageContactsActivity extends Activity {
                 new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
                 adapter.add(toAdd);
                 adapter.notifyDataSetChanged();
-                hideKeyboard();
-                messageText.setText("");
                 hideAddMessage();
             }
         });
@@ -301,8 +314,6 @@ public class ManageContactsActivity extends Activity {
                 toEdit.setMessage(messageText.getText().toString());
                 new CommitDbTask().execute(new DbOperation(toEdit, DbOperationType.EDIT));
                 adapter.notifyDataSetChanged();
-                hideKeyboard();
-                messageText.setText("");
                 hideAddMessage();
             }
         });

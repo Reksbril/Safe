@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//wpisywanie wiadomości, która ma zostać wysłana powinna być w większym oknie i ogólnie to jakoś bardziej ogarnięte
 //lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
 //lista kontaktów w dodawaniu do nowego activity powinna być na całą szerokość
 //wyświetlanie na liście kontaktów, poza imieniem, też jakąś część wiadomości
@@ -60,5 +59,6 @@ public class MainActivity extends AppCompatActivity {
 //stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś
 //ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans
 //wydajnośc listview
+//dodać taki mały "+" w prawym dolnym rogu do dodawania kontaktów
 
 //ogólny design aplikacji
