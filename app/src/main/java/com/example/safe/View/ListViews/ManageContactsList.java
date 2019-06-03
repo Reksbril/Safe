@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,16 +65,22 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
             rowView.findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);
             rowView.findViewById(R.id.editButton).setVisibility(View.INVISIBLE);
             CheckBox box = rowView.findViewById(R.id.checkBox);
-            box.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(((CheckBox)v).isChecked())
-                        ((StartActivity) context).checkBox(position);
-                    else
-                        ((StartActivity) context).uncheckBox(position);
-                    checkBoxes.put(position, ((CheckBox)v).isChecked());
-                }
-            });
+            if(((StartActivity)context).isAdded(position)) {
+                rowView.setForeground(
+                        new ColorDrawable(context.getResources().getColor(R.color.grey, null)));
+                box.setClickable(false);
+            } else {
+                box.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(((CheckBox)v).isChecked())
+                            ((StartActivity) context).checkBox(position);
+                        else
+                            ((StartActivity) context).uncheckBox(position);
+                        checkBoxes.put(position, ((CheckBox)v).isChecked());
+                    }
+                });
+            }
             Boolean oldBox = checkBoxes.get(position);
             if(oldBox != null) {
                 if(oldBox)

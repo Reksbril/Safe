@@ -171,8 +171,8 @@ public class StartActivity extends Activity {
         addedContacts = new ArrayList<>();
         contactsAdapter = new
                 ContactsList(this, contacts);
-        ListView list = findViewById(R.id.contactList);
-        list.setAdapter(contactsAdapter);
+        ListView listView = findViewById(R.id.contactList);
+        listView.setAdapter(contactsAdapter);
 
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -259,6 +259,7 @@ public class StartActivity extends Activity {
     private void openChoosingContacts() {
         findViewById(R.id.chooseContactsView).setVisibility(View.VISIBLE);
         addViewOpened = true;
+        adapter.notifyDataSetChanged();
     }
 
     private void closeChoosingContacts() {
@@ -313,5 +314,10 @@ public class StartActivity extends Activity {
             closePhoneContacts();
         else
             super.onBackPressed();
+    }
+
+
+    public boolean isAdded(int position) {
+        return addedContacts.contains(position);
     }
 }

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//uniemożliwić dodawanie kilka razy tego samego kontaktu - najlepiej checkboxy żeby były zaznaczone w tych kontaktach które są już dodane, albo jakoś na szaro je zrobić
 //czasami nie dziaała obracanie ekranu - to też ogarnąć
 //poprawić/dodać sprawdzanie dostępów (lokalizacja, wiadomości, kotakty...)
 //dodać komunikaty o błędach w momencie rozpoczynania activity (czas/lokalicacja/kontakty)
