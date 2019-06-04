@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
@@ -74,14 +75,7 @@ public class StartActivity extends Activity {
         findViewById(R.id.chooseLocation).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), SelectDestinationActivity.class);
-                if(destination != null) {
-                    intent.putExtra(getString(R.string.location_available), true);
-                    intent.putExtra(getString(R.string.location), destination);
-                    intent.putExtra(getString(R.string.address), addressView.getText());
-                } else
-                    intent.putExtra(getString(R.string.location_available), false);
-                startActivityForResult(intent, DEST_SELECT_CODE);
+                startChoosingLocation();
             }
         });
 
@@ -109,16 +103,32 @@ public class StartActivity extends Activity {
         findViewById(R.id.startButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyboard();
                 if(destination == null) {
-                    //TODO potrzebny adres
+                    Snackbar.make(v, "Destination is needed", Snackbar.LENGTH_LONG)
+                            .setAction("Set destination", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startChoosingLocation();
+                                }
+                            }).show();
                     return;
                 }
                 if(!goodTime(time.getText().toString())) {
-                    //TODO zły czas
+                    Snackbar.make(v, "Setting estimated time is needed", Snackbar.LENGTH_LONG)
+                            .setAction("", null).show();
                     return;
                 }
                 if(contacts.size() == 0) {
-                    //TODO za mało kontaktów
+                    Snackbar.make(v, "At least one contact must be chosen", Snackbar.LENGTH_LONG)
+                            .setAction("Add contacts", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    phoneContactsOpened = true;
+                                    openChoosingContacts();
+                                    hideKeyboard();
+                                }
+                            }).show();
                     return;
                 }
                 //permission do wysyłania sms
@@ -299,6 +309,17 @@ public class StartActivity extends Activity {
         if(toAdd.size() == 0)
             accept.setVisibility(View.INVISIBLE);
         accept.setText("Confirm (" + toAdd.size() + ")");
+    }
+
+    private void startChoosingLocation() {
+        Intent intent = new Intent(getApplicationContext(), SelectDestinationActivity.class);
+        if(destination != null) {
+            intent.putExtra(getString(R.string.location_available), true);
+            intent.putExtra(getString(R.string.location), destination);
+            intent.putExtra(getString(R.string.address), addressView.getText());
+        } else
+            intent.putExtra(getString(R.string.location_available), false);
+        startActivityForResult(intent, DEST_SELECT_CODE);
     }
 
     private boolean goodTime(String time) {
