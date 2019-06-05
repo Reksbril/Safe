@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -154,18 +155,13 @@ public class ManageContactsActivity extends Activity {
             }
         }.execute(this);
 
-        Button addButton = new Button(this);
-        addButton.setText(R.string.add_contact);
+        FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openPhoneContacts();
             }
         });
-
-        ListView list = findViewById(R.id.contactsList);
-        list.addHeaderView(addButton);
-
 
         Button backButton = new Button(this);
         backButton.setText(R.string.back);

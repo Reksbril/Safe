@@ -78,11 +78,6 @@
             android:text="@string/add_contact"
             android:visibility="visible" />
 
-        <Button
-            android:id="@+id/startButton"
-            android:layout_width="match_parent"
-            android:layout_height="176dp"
-            android:text="@string/start_activity" />
     </LinearLayout>
 
     <android.support.constraint.ConstraintLayout
@@ -104,5 +99,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        app:borderWidth="0.5dp"
+        app:hoveredFocusedTranslationZ="6dp"
+        app:pressedTranslationZ="6dp"
+        app:srcCompat="@android:drawable/ic_media_play"
+        app:fabSize="normal"/>
 
 </android.widget.FrameLayout>

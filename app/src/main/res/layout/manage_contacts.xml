@@ -115,4 +115,18 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        app:backgroundTint="#009688"
+        app:borderWidth="0.5dp"
+        app:fabSize="normal"
+        app:hoveredFocusedTranslationZ="6dp"
+        app:pressedTranslationZ="6dp"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
 </FrameLayout>

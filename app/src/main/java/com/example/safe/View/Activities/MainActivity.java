@@ -51,14 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 //TODO list
-//sprawdzić czy smsy działają
 //poprawić design okna wybru kontaktu
 //stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś - snackbar jest spoko w sumie
 //ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans
 //kliknięcie na kontakt powinno pokazywać całą wiadomość do wysłania
 //wydajnośc listview
-//coś zbugowane z tą listą gdzie są checkboxy (jak się zamknie z zaznaczonymi, to po otwarciu dalej są jakieś zaznaczone)
-//przycisk startactivity powinien być jakiś inny. Na przykład podobnie jak z tym plusem w dodawaniu kontaktów
 //tak samo przycisk add new - może być w sumie jako header zamiast footer, ale coś trzeba zmienić
 //dodać taki mały "+" w prawym dolnym rogu do dodawania kontaktów
 //lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
