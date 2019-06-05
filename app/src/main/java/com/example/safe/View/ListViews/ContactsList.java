@@ -1,6 +1,7 @@
 package com.example.safe.View.ListViews;
 
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.example.safe.View.Activities.StartActivity;
 
 import org.w3c.dom.Text;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 public class ContactsList extends ArrayAdapter<Contact>{
@@ -33,17 +35,22 @@ public class ContactsList extends ArrayAdapter<Contact>{
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.list_item, null, true);
 
-        ImageView img = rowView.findViewById(R.id.imageView);
-        img.setImageResource(R.drawable.common_google_signin_btn_icon_dark_normal_background);
+
+        Contact contact = getItem(position);
 
         TextView textView = rowView.findViewById(R.id.name);
         textView.setText(getItem(position).getName());
 
         String message = getItem(position).getMessage();
-        if (message.length() > MAX_MESSAGE_LEN)
-            message = message.substring(0, MAX_MESSAGE_LEN - 3) + "...";
         ((TextView) rowView.findViewById(R.id.shortMessage)).setText(message);
 
+        ImageView img = rowView.findViewById(R.id.imageView);
+        byte[] image = contact.getImage();
+        if(image.length > 0) {
+            img.setImageBitmap(Contact.decodeImage(image));
+        } else {
+            img.setImageResource(R.mipmap.ic_launcher);
+        }
 
         rowView.findViewById(R.id.buttonDelete).setOnClickListener(new View.OnClickListener() {
             @Override

@@ -3,10 +3,17 @@ package com.example.safe.Model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.safe.R;
+
+import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 public class Contact {
@@ -19,20 +26,16 @@ public class Contact {
     @ColumnInfo
     private String message;
     @ColumnInfo
-    private Integer imageId;
+    private byte[] image;
 
-    public Contact(@NonNull String number, @NonNull String name, @NonNull String message) {
-        this(number, name, message, R.drawable.ic_launcher_foreground);
-    }
-
-    private Contact(@NonNull String number,
+    public Contact(@NonNull String number,
                     @NonNull String name,
                     @NonNull String message,
-                    @NonNull Integer imageId) {
+                    @NonNull byte[] image) {
         this.number = number;
         this.name = name;
         this.message = message;
-        this.imageId = imageId;
+        this.image = image;
     }
 
     public void setMessage(String message) {
@@ -43,8 +46,8 @@ public class Contact {
         return message;
     }
 
-    public Integer getImageId() {
-        return imageId;
+    public byte[] getImage() {
+        return image;
     }
 
 
@@ -52,13 +55,21 @@ public class Contact {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNumber(@NonNull String number) {
+        this.number = number;
+    }
+
     @NonNull
     public String getNumber() {
         return number;
     }
 
-    public void setImageId(Integer imageId) {
-        this.imageId = imageId;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     @Override
@@ -83,5 +94,22 @@ public class Contact {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public static Bitmap decodeImage(byte[] image) {
+        ByteArrayInputStream imageStream = new ByteArrayInputStream(image);
+        return BitmapFactory.decodeStream(imageStream);
+    }
+
+    public static byte[] encodeImage(Bitmap image) {
+        if(image == null)
+            return new byte[0];
+        int size = image.getByteCount();
+        ByteBuffer b = ByteBuffer.allocate(size);
+        image.copyPixelsToBuffer(b);
+        b.rewind();
+        byte[] bytes = new byte[size];
+        b.get(bytes, 0, bytes.length);
+        return bytes;
     }
 }

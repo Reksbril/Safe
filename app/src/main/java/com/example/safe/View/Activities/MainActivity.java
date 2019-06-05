@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.safe.R;
+import com.example.safe.View.Background.Sms;
+import com.example.safe.View.ListViews.PhoneContactsList;
 import com.getbase.floatingactionbutton.AddFloatingActionButton;
 
 import static android.content.ContentValues.TAG;
@@ -43,15 +45,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
     }
 }
 
@@ -59,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
 //TODO list
 //sprawdzić czy smsy działają
-//usuwanie klawiatury w odpowiednich momentach, w oknie rozpoczynania activity
-//możliwośc anulowania edycji kontaktu w oknie "managecontactsactivity"
 //poprawić design okna wybru kontaktu
 //stop button powinien raczej robić coś więcej - wyświetlać jakis komunikat czy coś - snackbar jest spoko w sumie
 //ogarnąć coś więcej do activity od trwającego activity - najlepiej jakieś info o czasie czy coś, ewentualnie dystans

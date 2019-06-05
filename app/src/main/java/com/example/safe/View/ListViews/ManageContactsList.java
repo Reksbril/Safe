@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -53,13 +54,18 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.list_item_edit, null,true);
 
-        String fullMessage = getItem(position).getMessage();
-        //String shortMessage = fullMessage.substring(0, Integer.min(fullMessage.length(), 50));
-        String shortMessage = fullMessage;
+        Contact contact = getItem(position);
 
-        ((TextView)rowView.findViewById(R.id.name)).setText(getItem(position).getName());
-        ((TextView)rowView.findViewById(R.id.message)).setText(shortMessage);
-        ((ImageView)rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
+        ((TextView)rowView.findViewById(R.id.name)).setText(contact.getName());
+        ((TextView)rowView.findViewById(R.id.message)).setText(contact.getMessage());
+
+        byte[] img = contact.getImage();
+        if(img.length > 0) {
+            ((ImageView)rowView.findViewById(R.id.imageView)).setImageBitmap(
+                    Contact.decodeImage(img));
+        } else {
+            ((ImageView)rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
+        }
 
         if(choose) {
             rowView.findViewById(R.id.deleteButton).setVisibility(View.INVISIBLE);

@@ -4,10 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -16,6 +19,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -27,6 +31,7 @@ import android.widget.ListView;
 
 import com.example.safe.Database.ContactDao;
 import com.example.safe.Database.Database;
+import com.example.safe.Model.ContactBasic;
 import com.example.safe.Model.ContactList;
 import com.example.safe.View.Activities.AsyncTasks.LoadDb;
 import com.example.safe.View.ListViews.ManageContactsList;
@@ -37,6 +42,8 @@ import com.example.safe.View.ListViews.PhoneContactsList;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,10 +58,10 @@ public class ManageContactsActivity extends Activity {
     private final String addOrEdit = "ADD_EDIT";
     private final String editIndex = "EDIT_INDEX";
     private final String deleteIndex = "DELETE_INDEX";
+    private final String toAddImage = "TO_ADD_IMAGE";
 
 
     private ArrayAdapter<Contact> adapter;
-    private CursorAdapter cursorAdapter;
     private EditText messageText;
     private ContactDao dao;
     private AlertDialog deleteDialog;
@@ -66,17 +73,19 @@ public class ManageContactsActivity extends Activity {
     private int toRemoveInDialog;
     private int editing;
 
-    class LoadContactsTask extends AsyncTask<Void, Void, Void> {
+    class LoadContactsTask extends AsyncTask<Void, Void, ArrayList<ContactBasic>> {
         @Override
-        protected Void doInBackground(Void... args) {
-            getContactList();
-            return null;
+        protected ArrayList<ContactBasic> doInBackground(Void... args) {
+            return getContactList();
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(ArrayList<ContactBasic> result) {
             ListView list = findViewById(R.id.phoneContacts);
-            list.setAdapter(cursorAdapter);
+            list.setAdapter(new PhoneContactsList(
+                    ManageContactsActivity.this,
+                    R.layout.list_phone_contact,
+                    result));
             showPhoneContacts();
             stopLoadingScreen();
         }
@@ -183,7 +192,8 @@ public class ManageContactsActivity extends Activity {
                 if (savedInstanceState.getBoolean(addOrEdit)) {
                     String name = savedInstanceState.getString(toAddNameCode);
                     String number = savedInstanceState.getString(toAddNumberCode);
-                    addToList(name, number, message);
+                    byte[] img = savedInstanceState.getByteArray(toAddImage);
+                    addToList(name, number, message, img);
                 } else {
                     int position = savedInstanceState.getInt(editIndex);
                     editListElement(position, message);
@@ -274,23 +284,71 @@ public class ManageContactsActivity extends Activity {
         hideKeyboard();
     }
 
-    private void getContactList() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+    private ArrayList<ContactBasic> getContactList() {
+        ArrayList<ContactBasic> result = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_CONTACTS},
                     getResources().getInteger(R.integer.REQUEST_ACCESS_CONTACTS));
         else {
             ContentResolver cr = getContentResolver();
-            Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                    null, null, null, null);
+            try (Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                    null, null, null, null)) {
+                if(cursor == null)
+                    return result;
 
-            cursorAdapter = new PhoneContactsList(this, cursor);
+                String name;
+                String phoneNo;
+                while (cursor.moveToNext()) {
+                    if (cursor.getInt(cursor.getColumnIndex(
+                            ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+
+                        String id = cursor.getString(
+                                cursor.getColumnIndex(ContactsContract.Contacts._ID));
+
+
+                        Bitmap photo = null;
+
+
+                        try {
+                            InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(),
+                                    ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.valueOf(id)));
+
+                            if (inputStream != null) {
+                                photo = BitmapFactory.decodeStream(inputStream);
+                                inputStream.close();
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        try (Cursor pCur = cr.query(
+                                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                new String[]{id}, null)) {
+                            while(pCur.moveToNext()) {
+                                phoneNo = pCur.getString(pCur.getColumnIndex(
+                                        ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                name = cursor.getString(cursor.getColumnIndex(
+                                        ContactsContract.Contacts.DISPLAY_NAME));
+
+                                result.add(new ContactBasic(name, phoneNo, photo));
+                            }
+                        }
+                    }
+                }
+            }
         }
+        return result;
     }
 
-
-    public void addToList(final String name, final String number, final String initMessage) {
+    public void addToList(final String name,
+                          final String number,
+                          final String initMessage,
+                          final byte[] image) {
         add_edit = true;
         toAddNumber = number;
         toAddName = name;
@@ -301,7 +359,7 @@ public class ManageContactsActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startLoadingScreen();
-                Contact toAdd = new Contact(number, name, messageText.getText().toString());
+                Contact toAdd = new Contact(number, name, messageText.getText().toString(), image);
                 new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
                 adapter.add(toAdd);
                 adapter.notifyDataSetChanged();

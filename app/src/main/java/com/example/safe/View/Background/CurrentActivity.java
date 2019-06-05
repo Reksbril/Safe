@@ -60,6 +60,14 @@ public class CurrentActivity extends Service {
 
         //todo ogarnąć dobrze to powiadomienie (napisy itd)
 
+        Intent showActivity = new Intent(this, OngoingActivity.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, showActivity, 0);
+
+        int iconId = R.mipmap.ic_launcher;
+        String title = "My awesome app";
+
+
         if (android.os.Build.VERSION.SDK_INT >= 26) { //TODO niższe wersje (bez notification channel)
             String CHANNEL_ID = "my_channel_01";
             CharSequence name = "my_channel";
@@ -74,15 +82,15 @@ public class CurrentActivity extends Service {
             mChannel.setShowBadge(false);
             manager.createNotificationChannel(mChannel);
 
-
-            Intent showActivity = new Intent(this, OngoingActivity.class);
-            PendingIntent pendingIntent =
-                    PendingIntent.getActivity(this, 0, showActivity, 0);
-
-            int iconId = R.mipmap.ic_launcher;
-            String title = "My awesome app";
-
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(iconId)
+                    .setContentTitle(title)
+                    .setContentIntent(pendingIntent)
+                    .setContentText("").build();
+
+            startForeground(1337, notification);
+        } else {
+            Notification notification = new Notification.Builder(this)
                     .setSmallIcon(iconId)
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)

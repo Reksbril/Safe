@@ -4,67 +4,65 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.Image;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.safe.Model.Contact;
+import com.example.safe.Model.ContactBasic;
 import com.example.safe.R;
 import com.example.safe.View.Activities.ManageContactsActivity;
 
-public class PhoneContactsList extends CursorAdapter {
-    private ContentResolver cr;
+import java.util.ArrayList;
+import java.util.zip.Inflater;
 
-    public PhoneContactsList(Context context, Cursor cursor) {
-        super(context, cursor, 0);
-        cr = context.getContentResolver();
+public class PhoneContactsList extends ArrayAdapter<ContactBasic> {
+    private final Activity context;
+
+
+    public PhoneContactsList(Activity context, int resource, ArrayList<ContactBasic> list) {
+        super(context, resource, list);
+        this.context = context;
     }
 
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        String id = cursor.getString(
-                cursor.getColumnIndex(ContactsContract.Contacts._ID));
+    public View getView(final int position, View view, ViewGroup parent) {
+            LayoutInflater inflater = context.getLayoutInflater();
+            View rowView = inflater.inflate(R.layout.list_phone_contact, null,true);
 
-        final String name = cursor.getString(cursor.getColumnIndex(
-                ContactsContract.Contacts.DISPLAY_NAME));
+            final ContactBasic contact = getItem(position);
+            if(contact != null) {
+                ((TextView) rowView.findViewById(R.id.name)).setText(contact.name);
+                ((TextView) rowView.findViewById(R.id.phoneNumber)).setText(contact.phoneNo);
 
-        if (cursor.getInt(cursor.getColumnIndex(
-                ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                if(contact.image != null)
+                    ((ImageView) rowView.findViewById(R.id.imageView)).setImageBitmap(contact.image);
+                else
+                    ((ImageView) rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
 
-            Cursor pCur = cr.query(
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null,
-                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                    new String[]{id}, null);
 
-            pCur.moveToNext();
-            final String phoneNo = pCur.getString(pCur.getColumnIndex(
-                    ContactsContract.CommonDataKinds.Phone.NUMBER));
-            pCur.close();
-
-            LayoutInflater inflater = LayoutInflater.from(context);
-            View rowView=inflater.inflate(R.layout.list_phone_contact, null,true);
-            ((TextView)rowView.findViewById(R.id.name)).setText(name);
-            ((TextView)rowView.findViewById(R.id.phoneNumber)).setText(phoneNo);
-            (rowView.findViewById(R.id.buttonAdd)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((ManageContactsActivity)v.getContext()).addToList(name, phoneNo, "");
-                }
-            });
+                (rowView.findViewById(R.id.buttonAdd)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((ManageContactsActivity) v.getContext())
+                                .addToList(contact.name,
+                                        contact.phoneNo,
+                                        "",
+                                        Contact.encodeImage(contact.image));
+                    }
+                });
+            }
             return rowView;
-        }
-        return null;
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
 
     }
 }

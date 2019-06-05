@@ -69,6 +69,7 @@ public class StartActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        time = findViewById(R.id.editTime);
 
         addressView = findViewById(R.id.displayLocation);
 
@@ -79,26 +80,6 @@ public class StartActivity extends Activity {
             }
         });
 
-        time = findViewById(R.id.editTime);
-        time.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //not used
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //not used
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(!goodTime(s.toString()))
-                    time.setTextColor(Color.RED);
-                else
-                    time.setTextColor(Color.BLACK);
-            }
-        });
 
         findViewById(R.id.startButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -230,6 +211,13 @@ public class StartActivity extends Activity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
+            }
+        });
+
+        findViewById(R.id.chooseContactsView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeChoosingContacts();
             }
         });
 
