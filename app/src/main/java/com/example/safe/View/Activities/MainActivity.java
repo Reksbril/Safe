@@ -57,12 +57,9 @@ public class MainActivity extends AppCompatActivity {
 //kliknięcie na kontakt powinno pokazywać całą wiadomość do wysłania
 //wydajnośc listview
 //tak samo przycisk add new - może być w sumie jako header zamiast footer, ale coś trzeba zmienić
-//dodać taki mały "+" w prawym dolnym rogu do dodawania kontaktów
 //lista kontaktów z telefonu w widoku dodwania kontaktów powinna być ładniejsza
 //lista kontaktów w dodawaniu do nowego activity powinna być na całą szerokość
 //ogarnąć wszystkie listy jeżeli chodzi o szerokość tych wszystkich widoków
-//najlepiej ustawić MAX_MESSAGE_LEN różne w zależności od szerokości ekranu itd
-//ogarnąć to powiadomienie dla niższych wersji - bez notification channel
 
 //ogólny design aplikacji
 //jak pojawiąją się jakieś okienka czy coś to zrobic żeby to wyglądało ładnie

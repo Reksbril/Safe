@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 public class CurrentActivity extends Service {
     private ActivityInfo activity;
     private NotificationManager manager;
+    String CHANNEL_ID = "my_channel_01";
 
     private class TimerImpl implements Timer {
         private int delay;
@@ -65,11 +67,10 @@ public class CurrentActivity extends Service {
                 PendingIntent.getActivity(this, 0, showActivity, 0);
 
         int iconId = R.mipmap.ic_launcher;
-        String title = "My awesome app";
+        String title = "Safe";
 
 
-        if (android.os.Build.VERSION.SDK_INT >= 26) { //TODO niższe wersje (bez notification channel)
-            String CHANNEL_ID = "my_channel_01";
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
             CharSequence name = "my_channel";
             String Description = "This is my channel";
             int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -86,7 +87,8 @@ public class CurrentActivity extends Service {
                     .setSmallIcon(iconId)
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)
-                    .setContentText("").build();
+                    .setContentText("")
+                    .build();
 
             startForeground(1337, notification);
         } else {
@@ -94,13 +96,13 @@ public class CurrentActivity extends Service {
                     .setSmallIcon(iconId)
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)
-                    .setContentText("").build();
+                    .setContentText("Your activity is running")
+                    .build();
 
             startForeground(1337, notification);
         }
 
         init(intent);
-
         return START_STICKY;
     }
 
@@ -116,7 +118,17 @@ public class CurrentActivity extends Service {
         Runnable onSuccess = new Runnable() {
             @Override
             public void run() {
-                //todo
+                Notification.Builder builder;
+                if (android.os.Build.VERSION.SDK_INT >= 26)
+                    builder = new Notification.Builder(CurrentActivity.this, CHANNEL_ID);
+                else
+                    builder = new Notification.Builder(CurrentActivity.this);
+                Notification notification = builder.setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Safe")
+                        .setContentText("Activity successfully finished")
+                        .build();
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                manager.notify(14, notification);
             }
         };
 
@@ -142,15 +154,6 @@ public class CurrentActivity extends Service {
         });
 
         activity.startActivity();
-    }
-
-    private boolean checkConditions() {
-        //todo
-        return true;
-    }
-
-    private void notifyUser() {
-        //todo
     }
 
 
