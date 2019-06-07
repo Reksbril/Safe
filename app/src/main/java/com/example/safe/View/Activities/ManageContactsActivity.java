@@ -81,14 +81,14 @@ public class ManageContactsActivity extends Activity {
     private int toRemoveInDialog;
     private int editing;
 
-    class LoadContactsTask extends AsyncTask<Void, Void, ArrayList<ContactBasic>> {
+    class LoadContactsTask extends AsyncTask<Void, Void, ArrayList<Contact>> {
         @Override
-        protected ArrayList<ContactBasic> doInBackground(Void... args) {
+        protected ArrayList<Contact> doInBackground(Void... args) {
             return getContactList();
         }
 
         @Override
-        protected void onPostExecute(ArrayList<ContactBasic> result) {
+        protected void onPostExecute(ArrayList<Contact> result) {
             ListView list = findViewById(R.id.phoneContacts);
             list.setAdapter(new PhoneContactsList(
                     ManageContactsActivity.this,
@@ -337,8 +337,8 @@ public class ManageContactsActivity extends Activity {
         });
     }
 
-    private ArrayList<ContactBasic> getContactList() {
-        ArrayList<ContactBasic> result = new ArrayList<>();
+    private ArrayList<Contact> getContactList() {
+        ArrayList<Contact> result = new ArrayList<>();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
@@ -388,7 +388,7 @@ public class ManageContactsActivity extends Activity {
                                 name = cursor.getString(cursor.getColumnIndex(
                                         ContactsContract.Contacts.DISPLAY_NAME));
 
-                                result.add(new ContactBasic(name, phoneNo, photo));
+                                result.add(new Contact(name, phoneNo, "", Contact.encodeImage(photo)));
                             }
                         }
                     }
@@ -411,17 +411,22 @@ public class ManageContactsActivity extends Activity {
         findViewById(R.id.acceptMessage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLoadingScreen();
                 Contact toAdd = new Contact(number, name, messageText.getText().toString(), image);
-                new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
-                //int pos = adapter.getPosition(toAdd);
-                //System.out.println(pos);
-                adapter.add(toAdd);
-                adapter.notifyDataSetChanged();
-                Toast.makeText(ManageContactsActivity.this,
-                        "Contact successfully added",
-                        Toast.LENGTH_SHORT).show();
-                hideAddMessage();
+                int pos = adapter.getPosition(toAdd);
+                if(pos != -1)
+                    Toast.makeText(ManageContactsActivity.this,
+                            "Contact already added!",
+                            Toast.LENGTH_SHORT).show();
+                else {
+                    startLoadingScreen();
+                    new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
+                    adapter.add(toAdd);
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(ManageContactsActivity.this,
+                            "Contact successfully added",
+                            Toast.LENGTH_SHORT).show();
+                    hideAddMessage();
+                }
             }
         });
     }

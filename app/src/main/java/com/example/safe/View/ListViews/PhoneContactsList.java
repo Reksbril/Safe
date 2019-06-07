@@ -25,11 +25,11 @@ import com.example.safe.View.Activities.ManageContactsActivity;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
 
-public class PhoneContactsList extends ArrayAdapter<ContactBasic> {
+public class PhoneContactsList extends ArrayAdapter<Contact> {
     private final Activity context;
 
 
-    public PhoneContactsList(Activity context, int resource, ArrayList<ContactBasic> list) {
+    public PhoneContactsList(Activity context, int resource, ArrayList<Contact> list) {
         super(context, resource, list);
         this.context = context;
     }
@@ -40,16 +40,14 @@ public class PhoneContactsList extends ArrayAdapter<ContactBasic> {
             LayoutInflater inflater = context.getLayoutInflater();
             View rowView = inflater.inflate(R.layout.list_phone_contact, null,true);
 
-            final ContactBasic contact = getItem(position);
+            final Contact contact = getItem(position);
             if(contact != null) {
-                ((TextView) rowView.findViewById(R.id.name)).setText(contact.name);
-                ((TextView) rowView.findViewById(R.id.phoneNumber)).setText(contact.phoneNo);
+                ((TextView) rowView.findViewById(R.id.name)).setText(contact.getName());
+                ((TextView) rowView.findViewById(R.id.phoneNumber)).setText(contact.getNumber());
 
-                if(contact.image != null) {
-                    if(contact.image.isRecycled())
-                        System.out.println("RECYCLED");
-                    else
-                    ((ImageView) rowView.findViewById(R.id.imageView)).setImageBitmap(contact.image);
+                if(contact.getImage().length > 0) {
+                    ((ImageView) rowView.findViewById(R.id.imageView)).setImageBitmap(
+                            Contact.decodeImage(contact.getImage()));
                 }
                 else
                     ((ImageView) rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
@@ -59,10 +57,10 @@ public class PhoneContactsList extends ArrayAdapter<ContactBasic> {
                     @Override
                     public void onClick(View v) {
                         ((ManageContactsActivity) v.getContext())
-                                .addToList(contact.name,
-                                        contact.phoneNo,
+                                .addToList(contact.getName(),
+                                        contact.getNumber(),
                                         "",
-                                        Contact.encodeImage(contact.image));
+                                        contact.getImage());
                     }
                 });
             }
