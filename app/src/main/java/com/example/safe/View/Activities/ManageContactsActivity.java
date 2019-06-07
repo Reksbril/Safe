@@ -1,6 +1,8 @@
 package com.example.safe.View.Activities;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -22,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,6 +32,8 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.safe.Database.ContactDao;
 import com.example.safe.Database.Database;
@@ -45,6 +50,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.ConstantCallSite;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,9 +59,10 @@ import java.util.List;
 public class ManageContactsActivity extends Activity {
     private final String phoneVisibility = "PHONE_VISIBILITY";
     private final String addVisibility = "ADD_VISIBLE";
-    private final String toAddNameCode = "TO_ADD_NAME";
+    private final String contactInfoVisibility = "INFO_VISIBILITY";
+    private final String nameCode = "TO_ADD_NAME";
     private final String toAddNumberCode = "TO_ADD_NUMBER";
-    private final String toAddMessage = "TO_ADD_MESSAGE";
+    private final String messageCode = "TO_ADD_MESSAGE";
     private final String addOrEdit = "ADD_EDIT";
     private final String editIndex = "EDIT_INDEX";
     private final String deleteIndex = "DELETE_INDEX";
@@ -184,9 +191,9 @@ public class ManageContactsActivity extends Activity {
                 openPhoneContacts();
 
             if (savedInstanceState.getInt(addVisibility) == View.VISIBLE) {
-                String message = savedInstanceState.getString(toAddMessage);
+                String message = savedInstanceState.getString(messageCode);
                 if (savedInstanceState.getBoolean(addOrEdit)) {
-                    String name = savedInstanceState.getString(toAddNameCode);
+                    String name = savedInstanceState.getString(nameCode);
                     String number = savedInstanceState.getString(toAddNumberCode);
                     byte[] img = savedInstanceState.getByteArray(toAddImage);
                     addToList(name, number, message, img);
@@ -194,6 +201,12 @@ public class ManageContactsActivity extends Activity {
                     int position = savedInstanceState.getInt(editIndex);
                     editListElement(position, message);
                 }
+            }
+
+            if(savedInstanceState.getInt(contactInfoVisibility) == View.VISIBLE) {
+                String message = savedInstanceState.getString(messageCode);
+                String name = savedInstanceState.getString(nameCode);
+                openContactInfo(name, message);
             }
         }
 
@@ -218,6 +231,13 @@ public class ManageContactsActivity extends Activity {
             }
         });
 
+        final ConstraintLayout contactsInfo = findViewById(R.id.contactInfoView);
+        contactsInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contactsInfo.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void openPhoneContacts() {
@@ -231,12 +251,15 @@ public class ManageContactsActivity extends Activity {
         outState.putInt(phoneVisibility, findViewById(R.id.phoneContactsView).getVisibility());
 
         //add new/ edit
-        outState.putInt(addVisibility, findViewById(R.id.addMessageView).getVisibility());
-        outState.putString(toAddNameCode, toAddName);
-        outState.putString(toAddNumberCode, toAddNumber);
-        outState.putBoolean(addOrEdit, add_edit);
-        outState.putString(toAddMessage, messageText.getText().toString());
-        outState.putInt(editIndex, editing);
+        int visibility = findViewById(R.id.addMessageView).getVisibility();
+        outState.putInt(addVisibility, visibility);
+        if(visibility == View.VISIBLE) {
+            outState.putString(nameCode, toAddName);
+            outState.putString(toAddNumberCode, toAddNumber);
+            outState.putBoolean(addOrEdit, add_edit);
+            outState.putString(messageCode, messageText.getText().toString());
+            outState.putInt(editIndex, editing);
+        }
 
         //delete
         if(deleteDialog != null && deleteDialog.isShowing()) {
@@ -245,39 +268,73 @@ public class ManageContactsActivity extends Activity {
         }
         else
             outState.putInt(deleteIndex, -1);
+
+        //contact info
+        visibility = findViewById(R.id.contactInfoView).getVisibility();
+        outState.putInt(contactInfoVisibility, visibility);
+        if(visibility == View.VISIBLE) {
+            outState.putString(nameCode, ((TextView)findViewById(R.id.contactName)).getText().toString());
+            outState.putString(messageCode, ((TextView)findViewById(R.id.contactMessage)).getText().toString());
+        }
+
     }
 
 
     private void stopLoadingScreen() {
-        ConstraintLayout layout = findViewById(R.id.loadingLayout);
-        layout.setVisibility(View.INVISIBLE);
+        final ConstraintLayout layout = findViewById(R.id.loadingLayout);
+        layout.animate().alpha(0).setDuration(100).setListener(new AnimatorListenerAdapter() {
+           @Override
+           public void onAnimationEnd(Animator animation) {
+               layout.setVisibility(View.INVISIBLE);
+           }
+        });
     }
 
     private void startLoadingScreen() {
         ConstraintLayout layout = findViewById(R.id.loadingLayout);
+        layout.setAlpha(0);
         layout.setVisibility(View.VISIBLE);
+        layout.animate().alpha(1f).setDuration(100).setListener(null);
     }
 
     private void showPhoneContacts() {
         ConstraintLayout layout = findViewById(R.id.phoneContactsView);
         layout.setVisibility(View.VISIBLE);
+        layout.animate().alpha(1f).setDuration(300).setListener(null);
     }
 
     private void hidePhoneContacts() {
-        ConstraintLayout layout = findViewById(R.id.phoneContactsView);
-        layout.setVisibility(View.INVISIBLE);
+        final ConstraintLayout layout = findViewById(R.id.phoneContactsView);
+        layout.animate().alpha(0f).setDuration(300).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                layout.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void showAddMessage(String initMessage) {
         EditText view = findViewById(R.id.messageText);
         view.setText(initMessage);
-        findViewById(R.id.addMessageView).setVisibility(View.VISIBLE);
+        ConstraintLayout messageView = findViewById(R.id.addMessageView);
+        messageView.setAlpha(0f);
+        messageView.setVisibility(View.VISIBLE);
+        messageView.animate().alpha(1f).setDuration(300).setListener(null);
     }
 
     private void hideAddMessage() {
-        findViewById(R.id.addMessageView).setVisibility(View.INVISIBLE);
-        messageText.setText("");
+        final ConstraintLayout messageView = findViewById(R.id.addMessageView);
+        final EditText view = findViewById(R.id.messageText);
         hideKeyboard();
+        messageView.animate().alpha(0f).setDuration(300).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                messageView.setVisibility(View.INVISIBLE);
+                view.setText("");
+            }
+        });
     }
 
     private ArrayList<ContactBasic> getContactList() {
@@ -357,8 +414,13 @@ public class ManageContactsActivity extends Activity {
                 startLoadingScreen();
                 Contact toAdd = new Contact(number, name, messageText.getText().toString(), image);
                 new CommitDbTask().execute(new DbOperation(toAdd, DbOperationType.ADD));
+                //int pos = adapter.getPosition(toAdd);
+                //System.out.println(pos);
                 adapter.add(toAdd);
                 adapter.notifyDataSetChanged();
+                Toast.makeText(ManageContactsActivity.this,
+                        "Contact successfully added",
+                        Toast.LENGTH_SHORT).show();
                 hideAddMessage();
             }
         });
@@ -429,6 +491,11 @@ public class ManageContactsActivity extends Activity {
                 }
             }
         }
+    }
 
+    public void openContactInfo(String name, String message) {
+        findViewById(R.id.contactInfoView).setVisibility(View.VISIBLE);
+        ((TextView)findViewById(R.id.contactName)).setText(name);
+        ((TextView)findViewById(R.id.contactMessage)).setText(message);
     }
 }

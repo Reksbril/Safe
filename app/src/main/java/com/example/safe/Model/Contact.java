@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import com.example.safe.R;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,18 +99,22 @@ public class Contact {
 
     public static Bitmap decodeImage(byte[] image) {
         ByteArrayInputStream imageStream = new ByteArrayInputStream(image);
-        return BitmapFactory.decodeStream(imageStream);
+        try {
+            Bitmap result = BitmapFactory.decodeStream(imageStream);
+            return result;
+        } catch(OutOfMemoryError error) {
+            error.printStackTrace();
+        }
+        return null;
     }
 
     public static byte[] encodeImage(Bitmap image) {
         if(image == null)
             return new byte[0];
-        int size = image.getByteCount();
-        ByteBuffer b = ByteBuffer.allocate(size);
-        image.copyPixelsToBuffer(b);
-        b.rewind();
-        byte[] bytes = new byte[size];
-        b.get(bytes, 0, bytes.length);
-        return bytes;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] result = stream.toByteArray();
+        image.recycle();
+        return result;
     }
 }

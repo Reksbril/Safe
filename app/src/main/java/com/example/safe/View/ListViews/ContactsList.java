@@ -30,8 +30,6 @@ public class ContactsList extends ArrayAdapter<Contact>{
 
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
-        final int MAX_MESSAGE_LEN = 30;
-
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.list_item, null, true);
 

@@ -45,8 +45,12 @@ public class PhoneContactsList extends ArrayAdapter<ContactBasic> {
                 ((TextView) rowView.findViewById(R.id.name)).setText(contact.name);
                 ((TextView) rowView.findViewById(R.id.phoneNumber)).setText(contact.phoneNo);
 
-                if(contact.image != null)
+                if(contact.image != null) {
+                    if(contact.image.isRecycled())
+                        System.out.println("RECYCLED");
+                    else
                     ((ImageView) rowView.findViewById(R.id.imageView)).setImageBitmap(contact.image);
+                }
                 else
                     ((ImageView) rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
 

@@ -12,9 +12,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.safe.Database.DbSingleton;
@@ -52,12 +56,15 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
         LayoutInflater inflater=context.getLayoutInflater();
-        View rowView=inflater.inflate(R.layout.list_item_edit, null,true);
+        final View rowView=inflater.inflate(R.layout.list_item_edit, null,true);
 
-        Contact contact = getItem(position);
+        final Contact contact = getItem(position);
 
-        ((TextView)rowView.findViewById(R.id.name)).setText(contact.getName());
-        ((TextView)rowView.findViewById(R.id.message)).setText(contact.getMessage());
+        TextView name = rowView.findViewById(R.id.name);
+        final TextView message = rowView.findViewById(R.id.message);
+
+        name.setText(contact.getName());
+        message.setText(contact.getMessage());
 
         byte[] img = contact.getImage();
         if(img.length > 0) {
@@ -73,7 +80,8 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
             CheckBox box = rowView.findViewById(R.id.checkBox);
             if(((StartActivity)context).isAdded(position)) {
                 rowView.setForeground(
-                        new ColorDrawable(context.getResources().getColor(R.color.grey, null)));
+                        new ColorDrawable(
+                                context.getResources().getColor(R.color.grey, null)));
                 box.setClickable(false);
             } else {
                 box.setOnClickListener(new View.OnClickListener() {
@@ -109,11 +117,25 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
                             getItem(position).getMessage());
                 }
             });
+
+
             rowView.findViewById(R.id.checkBox).setVisibility(View.INVISIBLE);
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //((ManageContactsActivity)context).openContactInfo(contact.getName(), contact.getMessage());
+                    //todo
+                  /*  if(message.getMaxLines() > 1)
+                        message.setMaxLines(1);
+                    else
+                        message.setMaxLines(100);*/
+                }
+            });
         }
 
         return rowView;
     }
+
 
     public void uncheckBoxes() {
         checkBoxes.clear();

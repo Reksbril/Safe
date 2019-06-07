@@ -1,6 +1,8 @@
 package com.example.safe.View.Activities;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +10,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -135,7 +138,7 @@ public class StartActivity extends Activity {
         LinearLayout footer = new LinearLayout(this);
         footer.setOrientation(LinearLayout.HORIZONTAL);
         accept = new Button(this);
-        accept.setVisibility(View.GONE);
+        accept.setVisibility(View.INVISIBLE);
 
 
         Button cancel = new Button(this);
@@ -217,7 +220,7 @@ public class StartActivity extends Activity {
         findViewById(R.id.chooseContactsView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeChoosingContacts();
+                closePhoneContacts();
             }
         });
 
@@ -271,21 +274,33 @@ public class StartActivity extends Activity {
     }
 
     private void openChoosingContacts() {
-        findViewById(R.id.chooseContactsView).setVisibility(View.VISIBLE);
+        final ConstraintLayout layout = findViewById(R.id.chooseContactsView);
         addViewOpened = true;
+        layout.setAlpha(0f);
+        layout.setVisibility(View.VISIBLE);
+        layout.animate().alpha(1f).setDuration(300).setListener(null);
         adapter.notifyDataSetChanged();
     }
 
     private void closeChoosingContacts() {
-        findViewById(R.id.chooseContactsView).setVisibility(View.INVISIBLE);
-        ((ManageContactsList)adapter).uncheckBoxes();
-        accept.setVisibility(View.INVISIBLE);
+        final ConstraintLayout layout = findViewById(R.id.chooseContactsView);
+        layout.animate().alpha(0f).setDuration(300).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                layout.setVisibility(View.INVISIBLE);
+                accept.setVisibility(View.INVISIBLE);
+                ((ManageContactsList)adapter).uncheckBoxes();
+            }
+        });
         addViewOpened = false;
     }
 
     public void checkBox(int position) {
-        if(toAdd.size() == 0)
+        if(toAdd.size() == 0) {
+            accept.setAlpha(0f);
             accept.setVisibility(View.VISIBLE);
+            accept.animate().alpha(1f).setDuration(200).setListener(null);
+        }
         toAdd.add(adapter.getItem(position));
         toAddIndices.add(position);
         accept.setText("Confirm (" + toAdd.size() + ")");
@@ -294,9 +309,15 @@ public class StartActivity extends Activity {
     public void uncheckBox(int position) {
         toAdd.remove(adapter.getItem(position));
         toAddIndices.remove((Integer)position);
-        if(toAdd.size() == 0)
-            accept.setVisibility(View.INVISIBLE);
-        accept.setText("Confirm (" + toAdd.size() + ")");
+        if(toAdd.size() == 0) {
+            accept.animate().alpha(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    accept.setVisibility(View.INVISIBLE);
+                    accept.setText("Confirm (" + toAdd.size() + ")");
+                }
+            });
+        }
     }
 
     private void startChoosingLocation() {

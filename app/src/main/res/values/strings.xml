@@ -29,6 +29,7 @@
     <string name="add_message_hint">Type message to send.</string>
     <string name="cancel_button">Cancel</string>
     <string name="decline_new_contact">Back</string>
+    <string name="name">Name</string>
 
     <string name="destination_needed">Choose destination first!</string>
 </resources>
