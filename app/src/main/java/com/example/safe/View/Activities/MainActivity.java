@@ -44,9 +44,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
 }
+
+
+//kontakty
+//firebase
+//lepsza mapa - przybliżona trasa np z polyline
+//tam gdzie stop dac mapę i jakieś śledzenie lokalizacji
+//w wiadomości dodać lokalizację
+//start activity jak "samouczek"
+
+
+
 
 
 
