@@ -9,12 +9,16 @@ import android.os.Bundle;
 import com.example.safe.Model.LocationGuard;
 import com.google.android.gms.location.LocationRequest;
 
+import java.util.HashSet;
+import java.util.Set;
+
 class LocationGuardImpl implements LocationGuard {
     private final Location destination;
     private Location currentLocation;
-    private long lastRequestMillis;
     private float eps = 1.f; //odległość od celu (w metrach), która jest uznawana za wystarczającą
                             //do zakończenia podróży
+
+    private final Set<Observer> observers = new HashSet<>();
 
 
     LocationGuardImpl(Context context, Location destination, long interval) {
@@ -37,6 +41,10 @@ class LocationGuardImpl implements LocationGuard {
                         @Override
                         public void onLocationChanged(Location location) {
                             currentLocation = location;
+                            synchronized (observers) {
+                                for(Observer o : observers)
+                                    o.notifyChange(location);
+                            }
                         }
 
                         @Override
@@ -69,5 +77,23 @@ class LocationGuardImpl implements LocationGuard {
     @Override
     public boolean outOfSafeLocation() {
         return false;
+    }
+
+    @Override
+    public void addObserver(Observer o) {
+        synchronized (observers) {
+            observers.add(o);
+        }
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        synchronized (observers) {
+            observers.remove(o);
+        }
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 }

@@ -6,11 +6,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.arch.persistence.room.Delete;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.location.Location;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -25,15 +27,22 @@ import com.example.safe.View.Activities.OngoingActivity;
 import com.example.safe.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CurrentActivity extends Service {
     private ActivityInfo activity;
     private NotificationManager manager;
     String CHANNEL_ID = "my_channel_01";
 
+
+    private Timer timer;
+    private LocationGuard guard;
+
     private class TimerImpl implements Timer {
         private int delay;
         private int numberOfTicksLeft;
+        private final Set<Observer> observers = new HashSet<>();
 
         TimerImpl(@IntRange(from = 1) int delay, @IntRange(from = 0) int numberOfTicks) {
             this.delay = delay;
@@ -49,8 +58,27 @@ public class CurrentActivity extends Service {
         public boolean tick() {
             if(numberOfTicksLeft == 0)
                 return false;
+
+            synchronized (observers) {
+                for (Observer obs : observers)
+                    obs.notifyChange(numberOfTicksLeft * delay * 1000);
+            }
             numberOfTicksLeft--;
             return true;
+        }
+
+        @Delete
+        public void addObserver(Observer observer) {
+            synchronized (observers) {
+                observers.add(observer);
+            }
+        }
+
+        @Override
+        public void removeObserver(Observer observer) {
+            synchronized (observers) {
+                observers.remove(observer);
+            }
         }
     }
 
@@ -60,9 +88,11 @@ public class CurrentActivity extends Service {
 
         manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-        //todo ogarnąć dobrze to powiadomienie (napisy itd)
+        Bundle bundle = intent.getExtras();
+        Location destination = (Location)bundle.get(getString(R.string.location_data));
 
         Intent showActivity = new Intent(this, OngoingActivity.class);
+        showActivity.putExtra(getString(R.string.destination), destination);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, showActivity, 0);
 
@@ -87,7 +117,7 @@ public class CurrentActivity extends Service {
                     .setSmallIcon(iconId)
                     .setContentTitle(title)
                     .setContentIntent(pendingIntent)
-                    .setContentText("")
+                    .setContentText("Your activity is running")
                     .build();
 
             startForeground(1337, notification);
@@ -113,7 +143,7 @@ public class CurrentActivity extends Service {
         int duration = bundle.getInt(context.getString(R.string.duration));
         final ArrayList<Message> messages = (ArrayList<Message>)bundle.get(context.getString(R.string.messages));
 
-        LocationGuard guard = new LocationGuardImpl(context, destination, 1000);
+        guard = new LocationGuardImpl(context, destination, 1000);
 
         Runnable onSuccess = new Runnable() {
             @Override
@@ -136,13 +166,18 @@ public class CurrentActivity extends Service {
             @Override
             public void run() {
                 for(Message message : messages)
-                    message.send();
+                    try {
+                        message.send(); //todo pozbyć się try catch
+                    } catch(IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
             }
         };
 
+        timer = new TimerImpl(1000, duration / 1000);
         activity = new ActivityInfo(
                 guard,
-                new TimerImpl(1000, duration / 1000),
+                timer,
                 onFail,
                 onSuccess);
 
@@ -165,6 +200,33 @@ public class CurrentActivity extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return new MyBinder();
+    }
+
+
+    public class MyBinder extends Binder {
+        public CurrentActivity getService() {
+            return CurrentActivity.this;
+        }
+    }
+
+    public void addLocationObserver(LocationGuard.Observer observer) {
+        guard.addObserver(observer);
+    }
+
+    public void addTimeObserver(Timer.Observer observer) {
+        timer.addObserver(observer);
+    }
+
+    public void removeLocationObserver(LocationGuard.Observer observer) {
+        guard.removeObserver(observer);
+    }
+
+    public void removeTimeObserver(Timer.Observer observer) {
+        timer.removeObserver(observer);
+    }
+
+    public Location getCurrentLocation() {
+        return guard.getCurrentLocation();
     }
 }

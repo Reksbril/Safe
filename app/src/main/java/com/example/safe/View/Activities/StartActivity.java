@@ -239,10 +239,12 @@ public class StartActivity extends Activity {
         intent.putExtra(getString(R.string.messages), messages);
 
         startService(intent);
-        finish();
 
         Intent newActivity = new Intent(getApplicationContext(), OngoingActivity.class);
+        newActivity.putExtra(getString(R.string.destination), destination);
         startActivity(newActivity);
+
+        finish();
     }
 
     private void closePhoneContacts() {

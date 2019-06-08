@@ -47,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-
-//kontakty
 //firebase
 //lepsza mapa - przybliżona trasa np z polyline
 //tam gdzie stop dac mapę i jakieś śledzenie lokalizacji
