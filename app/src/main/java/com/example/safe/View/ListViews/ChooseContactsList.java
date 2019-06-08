@@ -79,9 +79,6 @@ public class ChooseContactsList extends ArrayAdapter<Contact> {
     }
 
 
-    public void uncheckBoxes() {
-        checkBoxes.clear();
-    }
 
     public void checkBoxes(List<Integer> indices) {
         for(int ind : indices) {

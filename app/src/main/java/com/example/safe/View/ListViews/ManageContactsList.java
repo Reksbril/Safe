@@ -73,15 +73,4 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
         return rowView;
     }
 
-
-    public void uncheckBoxes() {
-        checkBoxes.clear();
-    }
-
-    public void checkBoxes(List<Integer> indices) {
-        for(int ind : indices) {
-            checkBoxes.put(ind, true);
-            ((StartActivity) context).checkBox(ind);
-        }
-    }
 }

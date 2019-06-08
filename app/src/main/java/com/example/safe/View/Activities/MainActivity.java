@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 //firebase
 //lepsza mapa - przybliżona trasa np z polyline
 //w wiadomości dodać lokalizację
-//start activity jak "samouczek"
 //zamiast przycisków back, zmienić zachowanie przycisku na panelu
 
 
