@@ -70,9 +70,12 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
         if(!bindToService())
             finish();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        findViewById(R.id.stopButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelActivity();
+            }
+        });
     }
 
     private void cancelActivity() {
@@ -88,6 +91,12 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
                 myService.addLocationObserver(locationObserver);
                 myService.addTimeObserver(timeObserver);
                 updateLocation(myService.getCurrentLocation(), true);
+                if(destination == null)
+                    destination = myService.getDestination();
+
+                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.map);
+                mapFragment.getMapAsync(OngoingActivity.this);
             }
 
             @Override
@@ -125,7 +134,7 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
         if (map != null) {
             LatLng myLoc = new LatLng(location.getLatitude(), location.getLongitude());
             if (first)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(myLoc, 15));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(myLoc,15));
         }
     }
 
@@ -165,7 +174,6 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     private void createMarker() {
-        if(destination != null)
         map.addMarker(new MarkerOptions()
                 .title("Destination")
                 .position(new LatLng(

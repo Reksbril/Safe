@@ -35,6 +35,7 @@ public class CurrentActivity extends Service {
     private NotificationManager manager;
     String CHANNEL_ID = "my_channel_01";
 
+    private Location destination;
 
     private Timer timer;
     private LocationGuard guard;
@@ -89,10 +90,9 @@ public class CurrentActivity extends Service {
         manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
         Bundle bundle = intent.getExtras();
-        Location destination = (Location)bundle.get(getString(R.string.location_data));
+        destination = (Location)bundle.get(getString(R.string.location_data));
 
         Intent showActivity = new Intent(this, OngoingActivity.class);
-        showActivity.putExtra(getString(R.string.destination), destination);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, showActivity, 0);
 
@@ -228,5 +228,9 @@ public class CurrentActivity extends Service {
 
     public Location getCurrentLocation() {
         return guard.getCurrentLocation();
+    }
+
+    public Location getDestination() {
+        return destination;
     }
 }
