@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.safe.Model.ActivityInfo;
 import com.example.safe.Model.LocationGuard;
 import com.example.safe.Model.Timer;
 import com.example.safe.View.Background.CurrentActivity;
@@ -41,6 +42,7 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
 
     private TextView timeView;
 
+    private ActivityInfo.Observer observer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +99,14 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
                 SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.map);
                 mapFragment.getMapAsync(OngoingActivity.this);
+
+                observer = new ActivityInfo.Observer() {
+                    @Override
+                    public void notifyFinish() {
+                        finish();
+                    }
+                };
+                myService.addFinishObserver(observer);
             }
 
             @Override
@@ -120,6 +130,7 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
     public void onDestroy() {
         super.onDestroy();
         if(myService != null) {
+            myService.removeFinishObserver(observer);
             myService.removeLocationObserver(locationObserver);
             myService.removeTimeObserver(timeObserver);
         }
@@ -142,7 +153,7 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                timeView.setText(Integer.toString(millisLeft));
+                timeView.setText(Integer.toString(millisLeft / 1000));
             }
         });
     }
@@ -155,8 +166,11 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
             @Override
             public void activate(OnLocationChangedListener onLocationChangedListener) {
                 listener = onLocationChangedListener;
-                if(myService != null)
-                    updateLocation(myService.getCurrentLocation(), true);
+                if(myService != null) {
+                    Location location = myService.getCurrentLocation();
+                    if(location != null)
+                        updateLocation(location, true);
+                }
             }
 
             @Override
@@ -174,10 +188,11 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     private void createMarker() {
-        map.addMarker(new MarkerOptions()
-                .title("Destination")
-                .position(new LatLng(
-                        destination.getLatitude(), destination.getLongitude()))
-                .draggable(false));
+        if (destination != null)
+            map.addMarker(new MarkerOptions()
+                    .title("Destination")
+                    .position(new LatLng(
+                            destination.getLatitude(), destination.getLongitude()))
+                    .draggable(false));
     }
 }

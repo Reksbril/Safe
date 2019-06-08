@@ -1,26 +1,12 @@
 package com.example.safe.View.Activities;
 
-import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.example.safe.R;
-import com.example.safe.View.Background.Sms;
-import com.example.safe.View.ListViews.PhoneContactsList;
-import com.getbase.floatingactionbutton.AddFloatingActionButton;
-
-import static android.content.ContentValues.TAG;
+import com.example.safe.View.Activities.StartActivity.StartActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,13 +31,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
 
 //firebase
 //lepsza mapa - przybliżona trasa np z polyline
-//tam gdzie stop dac mapę i jakieś śledzenie lokalizacji
 //w wiadomości dodać lokalizację
 //start activity jak "samouczek"
+//zamiast przycisków back, zmienić zachowanie przycisku na panelu
 
 
 

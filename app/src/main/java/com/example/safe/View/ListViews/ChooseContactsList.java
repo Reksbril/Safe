@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ManageContactsList extends ArrayAdapter<Contact> {
+public class ChooseContactsList extends ArrayAdapter<Contact> {
     private final Activity context;
     private Map<Integer, Boolean> checkBoxes;
 
 
-    public ManageContactsList(Activity context,
+    public ChooseContactsList(Activity context,
                               int resource,
                               ContactList contacts) {
         super(context, resource, contacts);
@@ -36,7 +36,7 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
-        final View rowView = inflater.inflate(R.layout.list_item_edit, null, true);
+        final View rowView = inflater.inflate(R.layout.list_item_choose, null, true);
 
         final Contact contact = getItem(position);
 
@@ -54,20 +54,25 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
             ((ImageView) rowView.findViewById(R.id.imageView)).setImageResource(R.mipmap.ic_launcher);
         }
 
-        rowView.findViewById(R.id.deleteButton).setOnClickListener(new View.OnClickListener() {
+        CheckBox box = rowView.findViewById(R.id.checkBox);
+
+        box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((ManageContactsActivity) v.getContext()).showDeleteDialog(position);
+                if (((CheckBox) v).isChecked())
+                    ((StartActivity) context).checkBox(position);
+                else
+                    ((StartActivity) context).uncheckBox(position);
+                checkBoxes.put(position, ((CheckBox) v).isChecked());
             }
         });
-        rowView.findViewById(R.id.editButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((ManageContactsActivity) v.getContext()).editListElement(
-                        position,
-                        getItem(position).getMessage());
-            }
-        });
+
+        Boolean oldBox = checkBoxes.get(position);
+        if (oldBox != null) {
+            if (oldBox)
+                box.setChecked(true);
+        } else
+            checkBoxes.put(position, false);
 
 
         return rowView;
@@ -81,7 +86,6 @@ public class ManageContactsList extends ArrayAdapter<Contact> {
     public void checkBoxes(List<Integer> indices) {
         for(int ind : indices) {
             checkBoxes.put(ind, true);
-            ((StartActivity) context).checkBox(ind);
         }
     }
 }

@@ -31,7 +31,12 @@
     <string name="decline_new_contact">Back</string>
     <string name="name">Name</string>
     <string name="stop">Stop</string>
+    <string name="pickTime">Pick time</string>
+    <string name="start">Start acticity</string>
 
     <string name="destination_needed">Choose destination first!</string>
     <string name="destination">DESTINATION</string>
+    <string name="red">red</string>
+    <string name="blue">r</string>
+    <string name="green">re</string>
 </resources>

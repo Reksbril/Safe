@@ -1,8 +1,6 @@
 package com.example.safe.View.ListViews;
 
 import android.app.Activity;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +10,8 @@ import android.widget.TextView;
 
 import com.example.safe.Model.Contact;
 import com.example.safe.R;
-import com.example.safe.View.Activities.StartActivity;
+import com.example.safe.View.Activities.StartActivity.StartActivity;
 
-import org.w3c.dom.Text;
-
-import java.net.URI;
 import java.util.ArrayList;
 
 public class ContactsList extends ArrayAdapter<Contact>{

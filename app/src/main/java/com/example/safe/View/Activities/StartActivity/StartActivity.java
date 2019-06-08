@@ -1,37 +1,30 @@
-package com.example.safe.View.Activities;
+package com.example.safe.View.Activities.StartActivity;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.safe.Database.DbSingleton;
 import com.example.safe.Model.Contact;
-import com.example.safe.Model.ContactList;
 import com.example.safe.Model.Message;
-import com.example.safe.View.Activities.AsyncTasks.LoadDb;
+import com.example.safe.View.Activities.OngoingActivity;
 import com.example.safe.View.Background.Sms;
+import com.example.safe.View.ListViews.ChooseContactsList;
 import com.example.safe.View.ListViews.ContactsList;
 import com.example.safe.View.Background.CurrentActivity;
 import com.example.safe.R;
@@ -43,7 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class StartActivity extends Activity {
+public class StartActivity extends AppCompatActivity {
     private final String locationCode = "DEST_LOCATION";
     private final String addressCode = "DEST_ADDRESS";
     private final String timeCode = "TIME";
@@ -59,16 +52,16 @@ public class StartActivity extends Activity {
     private TextView addressView;
     private EditText time;
     private ArrayAdapter<Contact> adapter;
-    private ArrayList<Contact> contacts;
+    private ArrayList<Contact> contacts = new ArrayList<>();
     private ContactsList contactsAdapter;
+    private int timemillis;
 
     //to load state
     private boolean addViewOpened = false;
-    private List<Contact> toAdd;
-    private ArrayList<Integer> toAddIndices;
-    private ArrayList<Integer> addedContacts;
+    private List<Contact> toAdd = new ArrayList<>();
+    private ArrayList<Integer> toAddIndices = new ArrayList<>();
 
-    @Override
+   /* @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
@@ -224,14 +217,21 @@ public class StartActivity extends Activity {
             }
         });
 
-    }
+    }*/
 
-    private void startNewActivity() {
+   public void setDestination(Location destination) {
+       this.destination = destination;
+   }
+
+   public void setTime(int timemillis) {
+       this.timemillis = timemillis;
+   }
+
+    public void startNewActivity() {
         Intent intent = new Intent(getApplicationContext(), CurrentActivity.class);
         intent.putExtra(getString(R.string.location_data), destination);
-        //duration in milliseconds
-        int duration = Integer.parseInt(time.getText().toString()) * 60 * 1000;
-        intent.putExtra(getString(R.string.duration), duration);
+        //duration in milliseconds;
+        intent.putExtra(getString(R.string.duration), timemillis);
 
         ArrayList<Message> messages = new ArrayList<>();
         for(Contact contact : contacts)
@@ -254,26 +254,6 @@ public class StartActivity extends Activity {
         toAddIndices.clear();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == Activity.RESULT_OK) {
-            if(data.getExtras() != null) {
-                destination = (Location)data.getExtras().get(getString(R.string.location));
-                CharSequence address = (CharSequence)data.getExtras().get(getString(R.string.address));
-                addressView.setText(address);
-            }
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle bundle) {
-        bundle.putParcelable(locationCode, destination);
-        bundle.putString(addressCode, addressView.getText().toString());
-        bundle.putString(timeCode, time.getText().toString());
-        bundle.putIntegerArrayList(toAddCode, toAddIndices);
-        bundle.putBoolean(addViewOpenedCode, addViewOpened);
-        bundle.putIntegerArrayList(contactsToAdd, addedContacts);
-    }
 
     private void openChoosingContacts() {
         final ConstraintLayout layout = findViewById(R.id.chooseContactsView);
@@ -298,32 +278,30 @@ public class StartActivity extends Activity {
     }
 
     public void checkBox(int position) {
-        if(toAdd.size() == 0) {
-            accept.setAlpha(0f);
-            accept.setVisibility(View.VISIBLE);
-            accept.animate().alpha(1f).setDuration(200).setListener(null);
-        }
-        toAdd.add(adapter.getItem(position));
+        contacts.add(adapter.getItem(position));
         toAddIndices.add(position);
-        accept.setText("Confirm (" + toAdd.size() + ")");
     }
 
     public void uncheckBox(int position) {
-        toAdd.remove(adapter.getItem(position));
+        contacts.remove(adapter.getItem(position));
         toAddIndices.remove((Integer)position);
-        if(toAdd.size() == 0) {
-            accept.animate().alpha(0f).setDuration(200).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    accept.setVisibility(View.INVISIBLE);
-                    accept.setText("Confirm (" + toAdd.size() + ")");
-                }
-            });
+    }
+
+    public void setAdapter(final ArrayAdapter<Contact> adapter) {
+        this.adapter = adapter;
+        for(int i : toAddIndices) {
+            contacts.add(adapter.getItem(i));
         }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ChooseContactsList)adapter).checkBoxes(toAddIndices);
+            }
+        });
     }
 
     private void startChoosingLocation() {
-        Intent intent = new Intent(getApplicationContext(), SelectDestinationActivity.class);
+        Intent intent = new Intent(getApplicationContext(), SelectDestination.class);
         if(destination != null) {
             intent.putExtra(getString(R.string.location_available), true);
             intent.putExtra(getString(R.string.location), destination);
@@ -342,10 +320,9 @@ public class StartActivity extends Activity {
     public void deleteContact(Contact contact) {
         Integer pos = adapter.getPosition(contact);
         contactsAdapter.remove(contact);
-        addedContacts.remove(pos);
     }
 
-    private void hideKeyboard() {
+    void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
         View view = getCurrentFocus();
@@ -356,21 +333,17 @@ public class StartActivity extends Activity {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    @Override
+   /* @Override
     public void onBackPressed() {
         if(phoneContactsOpened)
             closePhoneContacts();
         else
             super.onBackPressed();
-    }
+    }*/
 
 
-    public boolean isAdded(int position) {
-        return addedContacts.contains(position);
-    }
 
-
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -380,5 +353,107 @@ public class StartActivity extends Activity {
                 startNewActivity();
             }
         }
+    }
+        @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == Activity.RESULT_OK) {
+            if(data.getExtras() != null) {
+                destination = (Location)data.getExtras().get(getString(R.string.location));
+                CharSequence address = (CharSequence)data.getExtras().get(getString(R.string.address));
+                addressView.setText(address);
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        bundle.putParcelable(locationCode, destination);
+        bundle.putString(addressCode, addressView.getText().toString());
+        bundle.putString(timeCode, time.getText().toString());
+        bundle.putIntegerArrayList(toAddCode, toAddIndices);
+        bundle.putBoolean(addViewOpenedCode, addViewOpened);
+        bundle.putIntegerArrayList(contactsToAdd, addedContacts);
+    }
+    */
+   private static final int NUM_PAGES = 3;
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter pagerAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main_tmp);
+
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = findViewById(R.id.viewpager);
+        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(pagerAdapter);
+
+        if(savedInstanceState != null) {
+            toAddIndices = (ArrayList<Integer>) savedInstanceState.get(toAddCode);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+        }
+    }
+
+    /**
+     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
+     * sequence.
+     */
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        private Fragment[] fragments = new Fragment[3];
+
+
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+            fragments[0] = new SelectDestination();
+            fragments[1] = new SelectTime();
+            fragments[2] = new SelectContacts();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if(position > 2 || position < 0)
+                return null;
+            return fragments[position];
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
+    }
+
+    public void goToNext() {
+        int current = mPager.getCurrentItem();
+        if(current < NUM_PAGES - 1)
+            mPager.setCurrentItem(current + 1, true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putParcelable(locationCode, destination);
+        bundle.putInt(timeCode, timemillis);
+        bundle.putIntegerArrayList(toAddCode, toAddIndices);
     }
 }

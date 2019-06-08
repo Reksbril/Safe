@@ -62,7 +62,7 @@ public class CurrentActivity extends Service {
 
             synchronized (observers) {
                 for (Observer obs : observers)
-                    obs.notifyChange(numberOfTicksLeft * delay * 1000);
+                    obs.notifyChange(numberOfTicksLeft * delay);
             }
             numberOfTicksLeft--;
             return true;
@@ -171,6 +171,7 @@ public class CurrentActivity extends Service {
                     } catch(IllegalArgumentException e) {
                         e.printStackTrace();
                     }
+
             }
         };
 
@@ -184,7 +185,7 @@ public class CurrentActivity extends Service {
         activity.addObserver(new ActivityInfo.Observer() {
             @Override
             public void notifyFinish() {
-                stopService(new Intent(getApplicationContext(), CurrentActivity.class));
+                stopForeground(true);
             }
         });
 
@@ -232,5 +233,13 @@ public class CurrentActivity extends Service {
 
     public Location getDestination() {
         return destination;
+    }
+
+    public void addFinishObserver(ActivityInfo.Observer observer) {
+        activity.addObserver(observer);
+    }
+
+    public void removeFinishObserver(ActivityInfo.Observer observer) {
+        activity.removeObserver(observer);
     }
 }

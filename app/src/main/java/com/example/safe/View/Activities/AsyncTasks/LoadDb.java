@@ -12,6 +12,7 @@ import com.example.safe.Model.Contact;
 import com.example.safe.Model.ContactList;
 import com.example.safe.R;
 import com.example.safe.View.Activities.ManageContactsActivity;
+import com.example.safe.View.ListViews.ChooseContactsList;
 import com.example.safe.View.ListViews.ManageContactsList;
 
 public abstract class LoadDb extends AsyncTask<Activity, Void, ArrayAdapter<Contact>> {
@@ -29,11 +30,14 @@ public abstract class LoadDb extends AsyncTask<Activity, Void, ArrayAdapter<Cont
     protected ArrayAdapter<Contact> doInBackground(Activity... args) {
         if(args.length != 1)
             throw new RuntimeException("Only one argument will be accepted!");
+        if(choose)
+            return new ChooseContactsList(args[0],
+                    R.layout.list_item_choose,
+                    new ContactList(dao.getAll()));
         return new ManageContactsList(
                 args[0],
                 R.layout.list_item_edit,
-                new ContactList(dao.getAll()),
-                choose);
+                new ContactList(dao.getAll()));
     }
 
     @Override

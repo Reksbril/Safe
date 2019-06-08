@@ -34,17 +34,9 @@
             android:scrollHorizontally="true" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/editButton"
+    <CheckBox
+        android:id="@+id/checkBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"
-        android:text="@string/edit_contact" />
-
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.1"
-        android:text="@string/delete_contact" />
+        android:layout_weight="1" />
 </LinearLayout>

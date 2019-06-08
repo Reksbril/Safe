@@ -22,7 +22,7 @@ public class ActivityInfo {
         void notifyFinish();
     }
 
-    private ArrayList<Observer> observers;
+    private final ArrayList<Observer> observers;
 
     public ActivityInfo(LocationGuard locationGuard, Timer timer, Runnable onFail, Runnable onSuccess) {
         this.locationGuard = locationGuard;
@@ -77,11 +77,21 @@ public class ActivityInfo {
     }
 
     public void addObserver(Observer observer) {
-        observers.add(observer);
+        synchronized (observers) {
+            observers.add(observer);
+        }
+    }
+
+    public void removeObserver(Observer observer) {
+        synchronized (observers) {
+            observers.remove(observer);
+        }
     }
 
     private void notifyObservers() {
-        for(Observer o : observers)
-            o.notifyFinish();
+        synchronized (observers) {
+            for (Observer o : observers)
+                o.notifyFinish();
+        }
     }
 }
