@@ -1,6 +1,7 @@
 package com.example.safe.View.Activities;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.arch.persistence.room.Delete;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -153,7 +154,17 @@ public class OngoingActivity extends FragmentActivity implements OnMapReadyCallb
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                timeView.setText(Integer.toString(millisLeft / 1000));
+                int seconds = millisLeft / 1000;
+                int minutes = seconds / 60;
+                int hours = minutes / 60;
+                seconds -= minutes * 60;
+                minutes -= hours * 60;
+                if(hours > 0)
+                    timeView.setText(String.format("%dh %02dm %02ds", hours, minutes, seconds));
+                else if(minutes > 0)
+                    timeView.setText(String.format("%dm %02ds", minutes, seconds));
+                else
+                    timeView.setText(String.format("%ds", seconds));
             }
         });
     }
